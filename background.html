@@ -1,0 +1,126 @@
+<!--
+   - For https://chrome.google.com/webstore/detail/mgmiemnjjchgkmgbeljfocdjjnpjnmcg
+   -->
+
+<!-- <script type="text/javascript" src="jquery.js"></script> -->
+<script src="jquery.js"></script>
+<script src="ext-core.js"></script>
+<script src="calendar.js"></script>
+<script type="text/javascript">
+	console.log("Background page loaded.");	
+	// Learn more about poke v2 here:
+	// https://github.com/michaelhart/Awesome-New-Tab-Page/wiki/Poke-v2
+	var info = {
+	  "poke"    :   2,              // poke version 2
+	  "width"   :   1,              // 406 px default
+	  "height"  :   2,              // 200 px default
+	  "path"    :   "widget.html",
+	  "v2"      :   {
+	                  "resize"    :   false,  // Set to true ONLY if you create a range below.
+	                  "min_width" :   1,
+	                  "max_width" :   1,
+	                  "min_height":   1,
+	                  "max_height":   2
+	                }
+	};
+	
+	chrome.extension.onRequestExternal.addListener(function(request, sender, sendResponse) {
+	  if(request === "mgmiemnjjchgkmgbeljfocdjjnpjnmcg-poke") {
+	    chrome.extension.sendRequest(
+	      sender.id,
+	      {
+	        head: "mgmiemnjjchgkmgbeljfocdjjnpjnmcg-pokeback",
+	        body: info,
+	      }
+	    );
+	  }
+	})
+	    		
+	var w = Blz.Widget, 
+		gcal = Blz.Google.Calendar,
+		app = MyGoogleCal.Application;
+	
+	w.initialize();
+	gcal.source = 'shayko-GoogleEventsANTP-1';
+	gcal.useGoogleLogin = (w.getPref('useGoogleApps')!='1') ? false : true;
+	app._offset = 0;
+	app.initialize();
+	
+	function update(force) {
+		
+		if (force) {
+			w.print("background.update: crear cache");
+			app.retrieveAllCalendar();
+		}
+		
+		if (app.isLoginRequesting()) {
+			//TODO send event to widget
+			//$cal._msg(w.getResourceString('NOW_LOGIN'),true);
+			return;
+		}
+		if (!app.isLogin()) {
+			if (app.isGoogleApps()) {
+				// required client login, go to option
+				$cal._msg(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]));
+			}
+			else {
+				// In Google account, extension will work with browser session. 
+				$cal._msg(w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]));
+			}
+			return;
+		}
+		if (app.isCalendarListRequesting()) {
+			//TODO send event to widget
+			//$cal._msg(w.getResourceString('LOADING_CALENDARLIST'),true);
+			return;
+		}
+		if (app.gcal.cacheCalendars.length==0){
+			//TODO send event to widget
+			console.log("No cached calendars");
+			//$cal._msg(w.getResourceString('NOTHING_CALENDARLIST'));
+			return;
+		}
+		var displayDayCount = w.getPref('displayDayCount'), showPast = (w.getPref('showPast') == '1');
+		for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 2; index < showDays; index++) {
+			var offset = app._offset + index;
+			var cStart = new Blz.GData.Date().addDays(offset).resetHours(), cEnd = cStart.clone().addDays(1);
+			var events = [], cache = app.getAppointments(cStart); // copy the array to add repeaters
+			for (calid in cache.items) {
+				var cal = app.findCalendarById(calid);
+				if (cal && cal.selected) {
+					events = events.concat(cache.items[calid]);
+				} else {
+					w.print('"'+cal.title+'" calendar is not selected.');
+				}
+			}
+		}
+		localStorage.setItem("events", JSON.stringify(events));
+		chrome.extension.sendRequest({name: "update"});
+	}
+	
+	var observer = {
+		onMyGoogleCalLoginCompleted: function(sender, event) {
+			w.print("background.onMyGoogleCalLoginCompleted:"+event.success);
+			if (event.success) {
+				app.retrieveAllCalendar();
+			}
+			update();
+		},
+		onMyGoogleCalCalendarLoaded: function(sender, event) {
+			w.print("background.onMyGoogleCalCalendarLoaded:"+event.items.length);
+			update();
+		},
+		onMyGoogleCalEventLoaded: function(sender, event) {
+			w.print("background.onMyGoogleCalEventLoaded:"+event.key);
+			update();
+		}
+	};
+		
+	//Update every so often
+	app.addObserver(observer);
+	// update for timer
+	setInterval(function(){update();},45*1000);
+	// update for modified events via 5 min
+	setInterval(function(){update(true);},300*1000);	
+	
+</script>

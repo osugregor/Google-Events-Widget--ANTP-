@@ -1,0 +1,14 @@
+{
+  "update_url": "http://clients2.google.com/service/update2/crx",
+  "background_page": "background.html",
+  "version": "1.0",
+  "name": "Google Events [ANTP]",
+  "description": "Google event widget for Awesome New Tab Page with multiple themes. [ANTP]",
+  "options_page": "options.html",
+  "default_locale": "en",
+  "icons": {
+    "256": "i256.png",
+    "128": "i128.png"
+  },
+  "permissions": [ "tabs", "notifications", "http://*.google.com/", "https://*.google.com/" ]
+}

@@ -1,0 +1,200 @@
+{
+   "ALL_DAY_EVENT": {
+      "message": "\u7D42\u65E5\u306E\u4E88\u5B9A"
+   },
+   "APP_DESCRIPTION": {
+      "message": "Google Calendar\u306B\u3042\u308B\u4ECA\u65E5\u306E\u4E88\u5B9A\u3092\u8868\u793A\u3057\u307E\u3059"
+   },
+   "APP_TITLE": {
+      "message": "Today's Schedule in Google Calendar\u2122"
+   },
+   "CALENDARLIST_ERROR_ALERT": {
+      "message": "\u30AB\u30EC\u30F3\u30C0\u30FC\u30EA\u30B9\u30C8\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u6642\u9593\u3092\u304A\u3044\u3066\u304B\u3089\u518D\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002\n\u30A6\u30A3\u30B8\u30A7\u30C3\u30C8\u3092\u3044\u3063\u305F\u3093\u9589\u3058\u3066\u518D\u8D77\u52D5\u3059\u308B\u3068\u53D6\u308C\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059\u3002"
+   },
+   "CANCEL_BUTTON": {
+      "message": "\u30AD\u30E3\u30F3\u30BB\u30EB"
+   },
+   "CLOSE_MENU": {
+      "message": "\u9589\u3058\u308B"
+   },
+   "CONFIRM_DELETEITEM_MSG": {
+      "message": "\u672C\u5F53\u306B\u3053\u306E\u30A2\u30A4\u30C6\u30E0\u3092\u524A\u9664\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?"
+   },
+   "COPY_MENU": {
+      "message": "\u30B3\u30D4\u30FC"
+   },
+   "CREATE_ITEM_MENU": {
+      "message": "\u65B0\u898F\u30A2\u30A4\u30C6\u30E0\u306E\u4F5C\u6210..."
+   },
+   "DELETE_BUTTON": {
+      "message": "\u524A\u9664"
+   },
+   "DELETE_MENU": {
+      "message": "\u524A\u9664..."
+   },
+   "EDIT_MENU": {
+      "message": "\u7DE8\u96C6..."
+   },
+   "GO_TO_CALENDAR": {
+      "message": "\u30AF\u30EA\u30C3\u30AF\u3059\u308B\u3068Google Calendar\u3092\u958B\u304D\u307E\u3059..."
+   },
+   "HEADER_DATE": {
+      "message": "$1/$2($3)"
+   },
+   "JUMP_BACKWORD": {
+      "message": "\u524D\u306E\u65E5\u306B\u79FB\u52D5"
+   },
+   "JUMP_FORWARD": {
+      "message": "\u6B21\u306E\u65E5\u306B\u79FB\u52D5"
+   },
+   "JUMP_TODAY": {
+      "message": "\u4ECA\u65E5\u306B\u79FB\u52D5"
+   },
+   "LOADING_CALENDARLIST": {
+      "message": "\u30AB\u30EC\u30F3\u30C0\u30FC\u30EA\u30B9\u30C8\u3092\u53D6\u5F97\u3057\u3066\u3044\u307E\u3059..."
+   },
+   "LOADING_EVENT": {
+      "message": "\u4E88\u5B9A\u3092\u8AAD\u307F\u8FBC\u3093\u3067\u3044\u307E\u3059..."
+   },
+   "LOGIN_BUTTON": {
+      "message": "\u30ED\u30B0\u30A4\u30F3"
+   },
+   "LOGIN_ERROR": {
+      "message": "\u30ED\u30B0\u30A4\u30F3\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F"
+   },
+   "LOGIN_ERROR_ALERT": {
+      "message": "\u30ED\u30B0\u30A4\u30F3\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u30E1\u30FC\u30EB\u3068\u30D1\u30B9\u30EF\u30FC\u30C9\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+   },
+   "NOTHING_CALENDARLIST": {
+      "message": "\u30AB\u30EC\u30F3\u30C0\u30FC\u30EA\u30B9\u30C8\u3092\u53D6\u5F97\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F"
+   },
+   "NOTHING_DISPLAY_EVENT": {
+      "message": "\u8868\u793A\u3059\u308B\u4E88\u5B9A\u304C\u3042\u308A\u307E\u305B\u3093"
+   },
+   "NOTHING_EVENT": {
+      "message": "\u4E88\u5B9A\u304C\u3042\u308A\u307E\u305B\u3093"
+   },
+   "NOW_LOGIN": {
+      "message": "\u30ED\u30B0\u30A4\u30F3\u3057\u3066\u3044\u307E\u3059..."
+   },
+   "OPEN_MENU": {
+      "message": "\u958B\u304F"
+   },
+   "PREF_24TIME_DESC": {
+      "message": "\u30C1\u30A7\u30C3\u30AF\u3092\u3064\u3051\u308B\u3068\u6642\u523B\u306E\u8868\u793A\u309212\u6642\u9593\u8868\u8A18(AM/PM)\u3092\u4F7F\u3046\u4EE3\u308F\u308A\u306B24\u6642\u9593\u8868\u8A18\u3067\u8868\u793A\u3057\u307E\u3059"
+   },
+   "PREF_24TIME_TITLE": {
+      "message": "24\u6642\u9593\u8868\u8A18\u3092\u5229\u7528\u3059\u308B"
+   },
+   "PREF_APPTFONTSIZE_TITLE": {
+      "message": "\u4E88\u5B9A\u30D5\u30A9\u30F3\u30C8\u30B5\u30A4\u30BA:"
+   },
+   "PREF_APPTTIMEFONTSIZE_TITLE": {
+      "message": "\u6642\u9593/\u5834\u6240\u30D5\u30A9\u30F3\u30C8\u30B5\u30A4\u30BA:"
+   },
+   "PREF_DAYCOUNT_DESC": {
+      "message": "\u4E00\u5EA6\u306B\u4E88\u5B9A\u3092\u8868\u793A\u3059\u308B\u65E5\u6570"
+   },
+   "PREF_DAYCOUNT_TITLE": {
+      "message": "\u65E5\u6570:"
+   },
+   "PREF_DEFAULTFONT_TITLE": {
+      "message": "\u30D5\u30A9\u30F3\u30C8:"
+   },
+   "PREF_GOOGLE_APPS_TITLE": {
+      "message": "Google Apps\u30A2\u30AB\u30A6\u30F3\u30C8\u3092\u4F7F\u7528\u3059\u308B"
+   },
+   "PREF_GROUP_ACCOUNT": {
+      "message": "\u30AB\u30EC\u30F3\u30C0\u30FC\u30A2\u30AB\u30A6\u30F3\u30C8"
+   },
+   "PREF_GROUP_APPEARANCE": {
+      "message": "\u8868\u793A"
+   },
+   "PREF_GROUP_APPOINTMENT": {
+      "message": "\u4E88\u5B9A"
+   },
+   "PREF_GROUP_FONT": {
+      "message": "\u30D5\u30A9\u30F3\u30C8"
+   },
+   "PREF_MAILSUBJECT_DESC": {
+      "message": "\u30E1\u30FC\u30EB\u4EF6\u540D:"
+   },
+   "PREF_MAILTO_TITLE": {
+      "message": "\u30E1\u30FC\u30EB\u5B9B\u5148:"
+   },
+   "PREF_MAIL_TITLE": {
+      "message": "\u30E1\u30FC\u30EB:"
+   },
+   "PREF_PASSWORD_TITLE": {
+      "message": "\u30D1\u30B9\u30EF\u30FC\u30C9:"
+   },
+   "PREF_SHOWPAST_DESC": {
+      "message": "\u30C1\u30A7\u30C3\u30AF\u3092\u3064\u3051\u308B\u3068\u904E\u304E\u305F\u4E88\u5B9A\u3092\u8868\u793A\u3057\u307E\u3059\u3002\uFF08\u5F53\u65E5\u306E\u4E88\u5B9A\u306E\u307F\u306B\u6709\u52B9\uFF09"
+   },
+   "PREF_SHOWPAST_TITLE": {
+      "message": "\u904E\u304E\u305F\u4E88\u5B9A\u3092\u8868\u793A\u3059\u308B"
+   },
+   "PREF_THEME_DESC": {
+      "message": ""
+   },
+   "PREF_THEME_TITLE": {
+      "message": "\u30C6\u30FC\u30DE:"
+   },
+   "PREF_UKDATEFORMAT_DESC": {
+      "message": "\u30C1\u30A7\u30C3\u30AF\u3092\u3064\u3051\u308B\u3068\u65E5\u4ED8\u306E\u8868\u793A\u3092\u6708/\u65E5\u3067\u306F\u306A\u304F\u65E5/\u6708\u3067\u8868\u793A\u3057\u307E\u3059"
+   },
+   "PREF_UKDATEFORMAT_TITLE": {
+      "message": "UK\u65E5\u4ED8\u8868\u8A18\u3092\u4F7F\u3046"
+   },
+   "REFRESH_MENU": {
+      "message": "\u753B\u9762\u306E\u66F4\u65B0"
+   },
+   "SAVE_BUTTON": {
+      "message": "\u4FDD\u5B58"
+   },
+   "SEND_MAIL_MENU": {
+      "message": "\u30E1\u30FC\u30EB\u306E\u9001\u4FE1..."
+   },
+   "SESSION_ERROR_ALERT": {
+      "message": "\u60C5\u5831\u3092\u53D6\u5F97\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002Google \u30AB\u30EC\u30F3\u30C0\u30FC\u3078\u003Ca href='$1' target='_blank'\u003E\u30ED\u30B0\u30A4\u30F3\u003C/a\u003E\u3057\u3066\u304B\u3089\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002"
+   },
+   "SHORTDAY_NAMES": {
+      "message": "\u65E5,\u6708,\u706B,\u6C34,\u6728,\u91D1,\u571F"
+   },
+   "SHORTMONTH_NAMES": {
+      "message": "1,2,3,4,5,6,7,8,9,10,11,12"
+   },
+   "TIME_FROM_TO": {
+      "message": "$1 \uFF5E $2"
+   },
+   "TODAY": {
+      "message": "\u4ECA\u65E5"
+   },
+   "TOMORROW": {
+      "message": "\u660E\u65E5"
+   },
+   "TO_GO_HOURS_MINUTE": {
+      "message": "\u3053\u306E\u4E88\u5B9A\u307E\u3067\u3042\u3068 $1 \u6642\u9593$2 \u5206"
+   },
+   "TO_GO_HOURS_MINUTES": {
+      "message": "\u3053\u306E\u4E88\u5B9A\u307E\u3067\u3042\u3068 $1 \u6642\u9593$2 \u5206"
+   },
+   "TO_GO_HOUR_MINUTE": {
+      "message": "\u3053\u306E\u4E88\u5B9A\u307E\u3067\u3042\u3068 $1 \u6642\u9593 $2 \u5206"
+   },
+   "TO_GO_HOUR_MINUTES": {
+      "message": "\u3053\u306E\u4E88\u5B9A\u307E\u3067\u3042\u3068 $1 \u6642\u9593 $2 \u5206"
+   },
+   "TO_GO_MINUTE": {
+      "message": "\u3053\u306E\u4E88\u5B9A\u307E\u3067\u3042\u3068 $1 \u5206"
+   },
+   "TO_GO_MINUTES": {
+      "message": "\u3053\u306E\u4E88\u5B9A\u307E\u3067\u3042\u3068 $1 \u5206"
+   },
+   "WINDOW_CAPTION": {
+      "message": "Today's Schedule in Google Calendar"
+   },
+   "YESTERDAY": {
+      "message": "\u6628\u65E5"
+   }
+}

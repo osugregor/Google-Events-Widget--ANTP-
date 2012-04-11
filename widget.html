@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<title>Google Events Widget [ANTP]</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <link rel="stylesheet" href="jquery.mobile.theme.css" />
+    <link rel="stylesheet" href="jquery.mobile.structure-1.0.1.css" /> 
+	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+    
+    <script src="calendar.js"></script>
+    <script src="jquery.xcolor.js"></script>
+    <style>
+    	body {
+    		padding: 0;
+    		margin: 0;
+    	}
+		.event_location {
+			font-style: italic;
+			font-size: 10px;
+			margin-top: -3px;
+		}
+		.event_color {
+			width: 8px;
+			height: 30px;
+			background: red;
+			border-left: 1px solid #222;
+			margin-top: -1px;
+			padding: 0;
+		}
+		#google_logo {
+			background-image: url('Logo_Google-Calendar.png');
+			display: none;
+			height: 225px;
+			width: 300px;
+		}
+    </style>   
+	<script>
+	
+		//Browser On Load Event
+		$(document).ready(function() { 
+			
+			//Extension Listeners   		    		
+			chrome.extension.onRequest.addListener(
+			    function(request, sender, sendResponse){
+			        switch (request.name){
+			        	case "update":
+			           		updateContent();
+			           		break;
+			     	}
+				}
+			);
+
+			//Custom jQuery Functions
+			$.fn.extend({
+				_msg: function(message, loading) {
+					$(this).append($('<span/>').addClass((loading) ? 'indicator' : 'message').html(message));
+					return this;
+				},
+				_cal_header: function(title, count){
+					//<li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
+					var count = $('<span/>').addClass('ui-li-count').html(count);
+					return $('<li/>').attr('data-role', 'list-divider')
+							.attr('role', 'heading')
+							.html(title).append(count);
+				},
+				_cal_event: function(title, location, time, url, color){
+					//<li data-corners="false" data-shadow="false" data-icon="false">
+					//	<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
+					//	<a href="index.html">
+					//		<h3 class="ui-li-heading">Event Title</h3>
+					//		<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
+					//		<p class="ui-li-desc event_location">Location</p>
+					//	</a>									
+					//</li>
+					var li = $('<li/>').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','false');
+					var event_color = $('<span/>').addClass('ui-li-aside ui-btn-inner event-color').css('padding', '0');
+					var event_title = $('<h3/>').addClass('ui-li-heading').html(title);
+					var event_time = $('<p/>').addClass('ui-li-aside ui-li-desc').html(time);
+					var event_location = $('<p/>').addClass('ui-li-desc event_location').html(location);
+					var event_details = $('<a/>').attr({href:event.link,target:'_blank'}).html(event_title).append(event_time).append(event_location);
+					li.append(event_color).append(event_details);
+					return li;
+				}
+			});
+	
+			function updateContent(){
+				var $cal = $('#events');
+				
+				console.log("---Current Events---");
+				events = JSON.parse(localStorage.getItem("events"));
+				console.log(events);
+				
+				var now = new Date();
+				var eventCount = 0, displayEventWithoutAllDayCount = 0, displayEventCount = 0, nextEventIndex = -1;
+				if (events.length > 0) {
+					//<ul data-role="listview" data-theme="a" data-divider-theme="c">
+					var $list = $('.events_ul').empty().addClass('event_list')
+							.attr('data-role', 'listview')
+							.attr('data-theme', 'a')
+							.attr('data-divider-theme', 'c');
+					
+					
+					
+					var displayDayCount = 5, showPast = false;
+					for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 2; index < showDays; index++) {	
+							
+						var offset = 0 + index;
+						var cStart = new Blz.GData.Date().addDays(offset).resetHours(), cEnd = cStart.clone().addDays(1);
+						
+						$list.append($.fn._cal_header('test', 2));
+						
+						for (var i=0, len=events.length; i<len; i++) {
+							var event = events[i];
+							if (event.allDay) {
+								// hack! filter event for time zone problem
+								//if (event.end<=cStart.date||event.start>=cEnd.date) continue;
+							}
+							//convert start/end to date object
+							event.start = new Date(event.start)
+							event.end = new Date(event.end)
+							eventCount++;	
+										
+							var location = (event.location && event.location.length > 0) ? event.location : '';
+							var time = (event.allDay) ? getResourceString('ALL_DAY_EVENT') : getTimeString(event.start);
+							var color = $.xcolor.lighten(event.color, 3, 25);
+							var remain = (now < event.start) ? getRemainTimeString(event.start) : '';
+							var tooltip = [event.title,time,remain,location].join(' ');
+							
+							var $li = $.fn._cal_event(event.title, location, time, event.url, color);
+							/*
+							var $li = $('<li/>').attr('bg',color);
+							$li.addClass((i%2==0) ? 'even' : 'odd');
+							if (i==0) $li.addClass('first');
+							if (i==len-1) $li.addClass('last');
+							
+							$li.append($('<a/>').attr({href:event.link,target:'_blank'}).addClass('event_title').html(event.title));
+							$li.append($('<span/>').addClass((event.allDay) ? 'event_allday' : 'event_fromto').html(time));
+							if (location != '') $li.append($('<span/>').addClass('event_location').html(location));
+							if (nextEventIndex==i) $li.append($('<span/>').addClass('event_timer').html(remain)); */
+							$list.append($li.attr({title:tooltip}));
+							displayEventCount++;
+						}
+					}
+					
+					//$cal.append($list);
+					$list.listview('refresh');
+				}
+				if (cache.loading) {
+					$cal._msg(getResourceString('LOADING_EVENT'),true);
+				} else if (eventCount == 0) {
+					$cal._msg(getResourceString('NOTHING_EVENT'));
+				} else if (displayEventCount == 0) {
+					$cal._msg(getResourceString('NOTHING_DISPLAY_EVENT'));
+				}		
+				
+			}
+			
+			function getTimeString(date) {
+				if (date) {
+					var use24 = 0;//TODO...FIX w.getPref('use24HourTime');
+					var partOne = date.getHours(), partTwo = date.getMinutes(), amPM = '';
+					if (use24==0) {
+						if (partOne > 12) {
+							partOne = partOne - 12;
+							amPM = ' PM';
+						} else {
+							amPM = (partOne == 12) ? ' PM' : ' AM';
+						}
+						if (partOne == 0) partOne = 12;
+					}
+					if (partTwo < 10) partTwo = '0' + partTwo;
+					return partOne + ':' + partTwo + amPM;
+				}
+				return '';
+			}
+			function getRemainTimeString(date) {
+				var now = new Date();
+				var remain = '', minutes = Math.ceil((date - now) / (60 * 1000));
+				if (minutes == 1) {
+					remain =  getResourceString('TO_GO_MINUTE',[1]); // TBD
+				} else if (minutes < 60) {
+					remain = (minutes > 1) ? getResourceString('TO_GO_MINUTES',[minutes]) : w.getResourceString('TO_GO_MINUTE',[minutes]);
+				} else if (minutes >= 60) {
+					var hours = Math.floor(Number(minutes) / 60);
+					minutes = minutes - 60 * hours;
+					if (hours > 1) {
+						remain = (minutes > 1) ? getResourceString('TO_GO_HOURS_MINUTES',[hours,minutes]) : w.getResourceString('TO_GO_HOURS_MINUTE',[hours,minutes]);
+					} else {
+						remain = (minutes > 1) ? getResourceString('TO_GO_HOUR_MINUTES',[hours,minutes]) : w.getResourceString('TO_GO_HOUR_MINUTE',[hours,minutes]);
+					}
+				}
+				return remain;
+			}
+			function Darken( hexColor, factor ){   
+		        if ( factor < 0 ) factor = 0;
+		
+		        var c = hexColor;
+		        if ( c.substr(0,1) == "#" )
+		        {
+		            c = c.substring(1);
+		        }
+		
+		        if ( c.length == 3 || c.length == 6 )
+		        {
+		            var i = c.length / 3;
+		
+		            var f;  // the relative distance from white
+		
+		            var r = parseInt( c.substr(0, i ), 16 );
+		            f = ( factor * r / (256-r) );
+		            r = Math.floor((256 * f) / (f+1));
+		
+		            r = r.toString(16);
+		            if ( r.length == 1 ) r = "0" + r;
+		
+		            var g = parseInt( c.substr(i, i), 16);
+		            f = ( factor * g / (256-g) );
+		            g = Math.floor((256 * f) / (f+1));
+		            g = g.toString(16);
+		            if ( g.length == 1 ) g = "0" + g;
+		
+		            var b = parseInt( c.substr( 2*i, i),16 );
+		            f = ( factor * b / (256-b) );
+		            b = Math.floor((256 * f) / (f+1));
+		            b = b.toString(16);
+		            if ( b.length == 1 ) b = "0" + b;
+		
+		            c =  r+g+b;
+		         }   
+		
+		         return "#" + c;
+		
+		    }
+			function getResourceString(b, a) {
+		        if (typeof (chrome) != "undefined" && typeof (chrome.i18n) != "undefined") {
+		            return chrome.i18n.getMessage(b, a)
+		        }
+		        return b
+		    }
+			updateContent();
+    	});
+    </script>
+  </head>
+  <body>
+	<div id="events" data-role="page" data-theme="a">
+  		<ul class="events_ul" data-role="listview" data-theme="a" data-divider-theme="c">
+  		<!---
+  			<li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
+			<li data-corners="false" data-shadow="false" data-icon="false">
+				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
+				<a href="index.html">
+					<h3 class="ui-li-heading">Event Title</h3>
+					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
+					<p class="ui-li-desc event_location">Location</p>
+				</a>									
+			</li>
+		--->
+		</ul>
+	</div>
+  </body>
+</html>

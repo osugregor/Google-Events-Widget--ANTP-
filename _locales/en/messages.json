@@ -1,0 +1,200 @@
+{
+   "ALL_DAY_EVENT": {
+      "message": "All Day Event"
+   },
+   "APP_DESCRIPTION": {
+      "message": "Shows today's shedule in Google Calendar\u2122"
+   },
+   "APP_TITLE": {
+      "message": "Today's Schedule in Google Calendar\u2122"
+   },
+   "CALENDARLIST_ERROR_ALERT": {
+      "message": "Can't retrieve calendar list. Please restart widget and try again."
+   },
+   "CANCEL_BUTTON": {
+      "message": "Cancel"
+   },
+   "CLOSE_MENU": {
+      "message": "Close"
+   },
+   "CONFIRM_DELETEITEM_MSG": {
+      "message": "Really delete the item?"
+   },
+   "COPY_MENU": {
+      "message": "Copy"
+   },
+   "CREATE_ITEM_MENU": {
+      "message": "Create New Item..."
+   },
+   "DELETE_BUTTON": {
+      "message": "Delete"
+   },
+   "DELETE_MENU": {
+      "message": "Delete..."
+   },
+   "EDIT_MENU": {
+      "message": "Edit..."
+   },
+   "GO_TO_CALENDAR": {
+      "message": "Click to go to Google Calendar..."
+   },
+   "HEADER_DATE": {
+      "message": "$1.$2.($3)"
+   },
+   "JUMP_BACKWORD": {
+      "message": "Previous Day"
+   },
+   "JUMP_FORWARD": {
+      "message": "Next Day"
+   },
+   "JUMP_TODAY": {
+      "message": "Move Today"
+   },
+   "LOADING_CALENDARLIST": {
+      "message": "Retrieving Calendar List..."
+   },
+   "LOADING_EVENT": {
+      "message": "Loading Events..."
+   },
+   "LOGIN_BUTTON": {
+      "message": "Sign in"
+   },
+   "LOGIN_ERROR": {
+      "message": "Can't Login"
+   },
+   "LOGIN_ERROR_ALERT": {
+      "message": "Can't Login. Please comfirm mail and password."
+   },
+   "NOTHING_CALENDARLIST": {
+      "message": "Can't Retrieve Calendar List..."
+   },
+   "NOTHING_DISPLAY_EVENT": {
+      "message": "No Events to Display"
+   },
+   "NOTHING_EVENT": {
+      "message": "No Events"
+   },
+   "NOW_LOGIN": {
+      "message": "Login..."
+   },
+   "OPEN_MENU": {
+      "message": "Open"
+   },
+   "PREF_24TIME_DESC": {
+      "message": "Check this box to display times in 24-hour format instead of AM/PM."
+   },
+   "PREF_24TIME_TITLE": {
+      "message": "Use 24-hour time format"
+   },
+   "PREF_APPTFONTSIZE_TITLE": {
+      "message": "Event Title Font Size:"
+   },
+   "PREF_APPTTIMEFONTSIZE_TITLE": {
+      "message": "Event Time/Location Font Size:"
+   },
+   "PREF_DAYCOUNT_DESC": {
+      "message": "Number of days to display the event."
+   },
+   "PREF_DAYCOUNT_TITLE": {
+      "message": "Days:"
+   },
+   "PREF_DEFAULTFONT_TITLE": {
+      "message": "Font:"
+   },
+   "PREF_GOOGLE_APPS_TITLE": {
+      "message": "Use Google Apps Account"
+   },
+   "PREF_GROUP_ACCOUNT": {
+      "message": "Calendar Account"
+   },
+   "PREF_GROUP_APPEARANCE": {
+      "message": "Appearance"
+   },
+   "PREF_GROUP_APPOINTMENT": {
+      "message": "Appointment"
+   },
+   "PREF_GROUP_FONT": {
+      "message": "Font"
+   },
+   "PREF_MAILSUBJECT_DESC": {
+      "message": "Mail Subject:"
+   },
+   "PREF_MAILTO_TITLE": {
+      "message": "Mail To:"
+   },
+   "PREF_MAIL_TITLE": {
+      "message": "Mail:"
+   },
+   "PREF_PASSWORD_TITLE": {
+      "message": "Password:"
+   },
+   "PREF_SHOWPAST_DESC": {
+      "message": "Past Events will show up dimmed when this is checked on Today. They will be hidden when this isn't checked."
+   },
+   "PREF_SHOWPAST_TITLE": {
+      "message": "Show Past Event"
+   },
+   "PREF_THEME_DESC": {
+      "message": ""
+   },
+   "PREF_THEME_TITLE": {
+      "message": "Theme:"
+   },
+   "PREF_UKDATEFORMAT_DESC": {
+      "message": "Check this box to display date in DD/MM instead of MM/DD."
+   },
+   "PREF_UKDATEFORMAT_TITLE": {
+      "message": "Use UK Date Format"
+   },
+   "REFRESH_MENU": {
+      "message": "Refresh"
+   },
+   "SAVE_BUTTON": {
+      "message": "Save"
+   },
+   "SEND_MAIL_MENU": {
+      "message": "Send Mail..."
+   },
+   "SESSION_ERROR_ALERT": {
+      "message": "Can't retrieve calendar info. Please \u003Ca href='$1' target='_blank'\u003ESign in\u003C/a\u003E to Google Calendar and try agamin."
+   },
+   "SHORTDAY_NAMES": {
+      "message": "Sun,Mon,Tue,Wed,Thu,Fri,Sat"
+   },
+   "SHORTMONTH_NAMES": {
+      "message": "Jan,Feb,Mar,Apr,May,June,July,Aug,Sep,Oct,Nov,Dec"
+   },
+   "TIME_FROM_TO": {
+      "message": "$1 to $2"
+   },
+   "TODAY": {
+      "message": "Today"
+   },
+   "TOMORROW": {
+      "message": "Tomorrow"
+   },
+   "TO_GO_HOURS_MINUTE": {
+      "message": "$1 hours $2 minute to GO!"
+   },
+   "TO_GO_HOURS_MINUTES": {
+      "message": "$1 hours $2 minutes to GO!"
+   },
+   "TO_GO_HOUR_MINUTE": {
+      "message": "$1 hour $2 minute to GO!"
+   },
+   "TO_GO_HOUR_MINUTES": {
+      "message": "$1 hour $2 minutes to GO!"
+   },
+   "TO_GO_MINUTE": {
+      "message": "$1 minute to GO!"
+   },
+   "TO_GO_MINUTES": {
+      "message": "$1 minutes to GO!"
+   },
+   "WINDOW_CAPTION": {
+      "message": "Today's Schedule in Google Calendar"
+   },
+   "YESTERDAY": {
+      "message": "Yesterday"
+   }
+}
