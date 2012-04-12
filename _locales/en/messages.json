@@ -39,7 +39,7 @@
       "message": "Click to go to Google Calendar..."
    },
    "HEADER_DATE": {
-      "message": "$1.$2.($3)"
+      "message": "$1 $2 ($3)"
    },
    "JUMP_BACKWORD": {
       "message": "Previous Day"

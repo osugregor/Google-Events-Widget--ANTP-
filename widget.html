@@ -20,10 +20,11 @@
 			margin-top: -3px;
 		}
 		.event_color {
-			width: 8px;
-			height: 30px;
+            float: left;
+			width: 5px;
+			height: 30px; /* With location is 30px, without is 20px */
 			background: red;
-			border-left: 1px solid #222;
+			border-right: 1px solid #222;
 			margin-top: -1px;
 			padding: 0;
 		}
@@ -35,6 +36,12 @@
 		}
     </style>   
 	<script>
+
+        $(document).bind("mobileinit", function(){
+          $.extend(  $.mobile , {
+            ajaxEnabled: false
+          });
+        });
 	
 		//Browser On Load Event
 		$(document).ready(function() { 
@@ -61,7 +68,9 @@
 					var count = $('<span/>').addClass('ui-li-count').html(count);
 					return $('<li/>').attr('data-role', 'list-divider')
 							.attr('role', 'heading')
-							.html(title).append(count);
+							.html(title).append(count).click(function(){
+                                $(this).nextUntil('li[data-role="list-divider"]').slideToggle();
+                            });
 				},
 				_cal_event: function(title, location, time, url, color){
 					//<li data-corners="false" data-shadow="false" data-icon="false">
@@ -72,20 +81,48 @@
 					//		<p class="ui-li-desc event_location">Location</p>
 					//	</a>									
 					//</li>
-					var li = $('<li/>').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','false');
-					var event_color = $('<span/>').addClass('ui-li-aside ui-btn-inner event-color').css('padding', '0');
+					var li = $('<li/>').addClass('event').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','false');
+                    if(location){
+                        console.log(location);
+                    }else{
+                        console.log("no location");
+                    }
+
 					var event_title = $('<h3/>').addClass('ui-li-heading').html(title);
 					var event_time = $('<p/>').addClass('ui-li-aside ui-li-desc').html(time);
-					var event_location = $('<p/>').addClass('ui-li-desc event_location').html(location);
-					var event_details = $('<a/>').attr({href:event.link,target:'_blank'}).html(event_title).append(event_time).append(event_location);
-					li.append(event_color).append(event_details);
-					return li;
-				}
+                    console.log("URL:"+url)
+					var event_details = $('<a/>').attr({href:url,target:'_top'}).html(event_title).append(event_time);
+					if(location){
+                        var event_location = $('<p/>').addClass('ui-li-desc event_location').html(location);
+                        event_details.append(event_location);
+                    }
+                    li.append(event_color).append(event_details);
+                    var event_color = $('<span/>').addClass('ui-li-aside ui-btn-inner event_color').css('height', location ? 30 : 20).css('padding', '0').css('background-color', color);
+					li.prepend(event_color);
+                    return li;
+				},
+                appointmentCompare: function (d, c) {
+                    var e = d.start - c.start;
+                    if (e == 0) {
+                        if (d.title < c.title) {
+                            return -1
+                        } else {
+                            if (d.title > c.title) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        }
+                    }
+                    return e
+                }
 			});
-	
+
+
+
 			function updateContent(){
 				var $cal = $('#events');
-				
+
 				console.log("---Current Events---");
 				events = JSON.parse(localStorage.getItem("events"));
 				console.log(events);
@@ -101,49 +138,48 @@
 					
 					
 					
-					var displayDayCount = 5, showPast = false;
+					var displayDayCount = 5, showPast = false, offset = 0;
 					for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 2; index < showDays; index++) {	
-							
-						var offset = 0 + index;
-						var cStart = new Blz.GData.Date().addDays(offset).resetHours(), cEnd = cStart.clone().addDays(1);
 						
-						$list.append($.fn._cal_header('test', 2));
-						
-						for (var i=0, len=events.length; i<len; i++) {
-							var event = events[i];
-							if (event.allDay) {
-								// hack! filter event for time zone problem
-								//if (event.end<=cStart.date||event.start>=cEnd.date) continue;
-							}
-							//convert start/end to date object
-							event.start = new Date(event.start)
-							event.end = new Date(event.end)
-							eventCount++;	
-										
-							var location = (event.location && event.location.length > 0) ? event.location : '';
-							var time = (event.allDay) ? getResourceString('ALL_DAY_EVENT') : getTimeString(event.start);
-							var color = $.xcolor.lighten(event.color, 3, 25);
-							var remain = (now < event.start) ? getRemainTimeString(event.start) : '';
-							var tooltip = [event.title,time,remain,location].join(' ');
-							
-							var $li = $.fn._cal_event(event.title, location, time, event.url, color);
-							/*
-							var $li = $('<li/>').attr('bg',color);
-							$li.addClass((i%2==0) ? 'even' : 'odd');
-							if (i==0) $li.addClass('first');
-							if (i==len-1) $li.addClass('last');
-							
-							$li.append($('<a/>').attr({href:event.link,target:'_blank'}).addClass('event_title').html(event.title));
-							$li.append($('<span/>').addClass((event.allDay) ? 'event_allday' : 'event_fromto').html(time));
-							if (location != '') $li.append($('<span/>').addClass('event_location').html(location));
-							if (nextEventIndex==i) $li.append($('<span/>').addClass('event_timer').html(remain)); */
-							$list.append($li.attr({title:tooltip}));
-							displayEventCount++;
-						}
+						offset = offset + index;
+						var cStart = new Blz.GData.Date().addDays(offset).resetHours(),
+                            cEnd = new Date(cStart.date.getFullYear(), cStart.date.getMonth(), cStart.date.getDate(), 23, 59, 59, 0);
+
+						var header = getHeaderDateString(cStart);
+                        if (offset == 0) header += ' - ' + getResourceString('TODAY');
+                        else if (offset == 1) header += ' - ' + getResourceString('TOMORROW');
+                        else if (offset == -1) header += ' - ' + getResourceString('YESTERDAY');
+						$list.append($.fn._cal_header(header, 0));
+
+                        if(events.length > 0){
+                            events.sort($.fn.appointmentCompare);
+
+                            for (var i=0, len=events.length; i<len; i++) {
+
+                                //convert start/end to date object
+                                var event = events[i];
+                                event.start = new Date(event.start);
+                                event.end = new Date(event.end);
+
+                                if (event.end<=cStart.date||event.start>=cEnd) continue;
+                                eventCount++;
+
+                                var location = (event.location && event.location.length > 0) ? event.location : '';
+                                var time = (event.allDay) ? getResourceString('ALL_DAY_EVENT') : getTimeString(event.start);
+                                var color = $.xcolor.lighten(event.color, 3, 25);
+                                var remain = (now < event.start) ? getRemainTimeString(event.start) : '';
+                                var tooltip = [event.title,time,remain,location].join(' ');
+
+                                var $li = $.fn._cal_event(event.title, location, time, event.link, color);
+                                $list.append($li.attr({title:tooltip}));
+                                displayEventCount++;
+                            }
+                        }
 					}
 					
 					//$cal.append($list);
 					$list.listview('refresh');
+                    update_cal_header_counts($list);
 				}
 				if (cache.loading) {
 					$cal._msg(getResourceString('LOADING_EVENT'),true);
@@ -154,6 +190,13 @@
 				}		
 				
 			}
+
+            function update_cal_header_counts($list){
+                $list.find('li[data-role="list-divider"]').each(function(){
+                   var total = $(this).nextUntil('li[data-role="list-divider"]').length;
+                   $(this).find('span.ui-li-count').html(total);
+                });
+            }
 			
 			function getTimeString(date) {
 				if (date) {
@@ -184,9 +227,9 @@
 					var hours = Math.floor(Number(minutes) / 60);
 					minutes = minutes - 60 * hours;
 					if (hours > 1) {
-						remain = (minutes > 1) ? getResourceString('TO_GO_HOURS_MINUTES',[hours,minutes]) : w.getResourceString('TO_GO_HOURS_MINUTE',[hours,minutes]);
+						remain = (minutes > 1) ? getResourceString('TO_GO_HOURS_MINUTES',[hours,minutes]) : getResourceString('TO_GO_HOURS_MINUTE',[hours,minutes]);
 					} else {
-						remain = (minutes > 1) ? getResourceString('TO_GO_HOUR_MINUTES',[hours,minutes]) : w.getResourceString('TO_GO_HOUR_MINUTE',[hours,minutes]);
+						remain = (minutes > 1) ? getResourceString('TO_GO_HOUR_MINUTES',[hours,minutes]) : getResourceString('TO_GO_HOUR_MINUTE',[hours,minutes]);
 					}
 				}
 				return remain;
@@ -237,16 +280,50 @@
 		        }
 		        return b
 		    }
+            function getHeaderDateString(date) {
+                var monthNames = getResourceString('SHORTMONTH_NAMES').split(',');
+                var dayNames = getResourceString('SHORTDAY_NAMES').split(',');
+                return getResourceString('HEADER_DATE',[monthNames[date.getMonth()-1],date.getDate(),dayNames[date.getDay()]]);
+            }
 			updateContent();
     	});
     </script>
   </head>
   <body>
 	<div id="events" data-role="page" data-theme="a">
+        <div data-role="header" data-theme="b">
+            <h1>Google Calendar</h1>
+        </div><!-- /header -->
   		<ul class="events_ul" data-role="listview" data-theme="a" data-divider-theme="c">
-  		<!---
+  		    <li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
+
+             <li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
+			<li data-corners="false" data-shadow="false" class="event" data-icon="false">
+				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
+				<a href="index.html">
+					<h3 class="ui-li-heading">Event Title</h3>
+					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
+					<p class="ui-li-desc event_location">Location</p>
+				</a>
+			</li>
+              <li data-corners="false" data-shadow="false" class="event" data-icon="false">
+				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
+				<a href="index.html">
+					<h3 class="ui-li-heading">Event Title</h3>
+					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
+					<p class="ui-li-desc event_location">Location</p>
+				</a>
+			</li>
+              <li data-corners="false" data-shadow="false" class="event" data-icon="false">
+				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
+				<a href="index.html">
+					<h3 class="ui-li-heading">Event Title</h3>
+					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
+					<p class="ui-li-desc event_location">Location</p>
+				</a>
+			</li>
   			<li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
-			<li data-corners="false" data-shadow="false" data-icon="false">
+			<li data-corners="false" data-shadow="false" class="event" data-icon="false">
 				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
 				<a href="index.html">
 					<h3 class="ui-li-heading">Event Title</h3>
@@ -254,7 +331,7 @@
 					<p class="ui-li-desc event_location">Location</p>
 				</a>									
 			</li>
-		--->
+
 		</ul>
 	</div>
   </body>

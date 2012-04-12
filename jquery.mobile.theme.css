@@ -57,14 +57,14 @@
 	border: 1px solid 		#2A2A2A /*{a-body-border}*/;
 	background: 			#222222 /*{a-body-background-color}*/;
 	color: 					#ffffff /*{a-body-color}*/;
-	 text-shadow: 0 /*{a-body-shadow-x}*/ 1px /*{a-body-shadow-y}*/ 0 /*{a-body-shadow-radius}*/ #000000 /*{a-body-shadow-color}*/;
+	text-shadow: 0 /*{a-body-shadow-x}*/ 1px /*{a-body-shadow-y}*/ 0 /*{a-body-shadow-radius}*/ #000000 /*{a-body-shadow-color}*/;
 	font-weight: normal;
-	background-image: -webkit-gradient(linear, left top, left bottom, from( #666666 /*{a-body-background-start}*/), to( #222222 /*{a-body-background-end}*/)); /* Saf4+, Chrome */
-	background-image: -webkit-linear-gradient( #666666 /*{a-body-background-start}*/, #222222 /*{a-body-background-end}*/); /* Chrome 10+, Saf5.1+ */
-	background-image:    -moz-linear-gradient( #666666 /*{a-body-background-start}*/, #222222 /*{a-body-background-end}*/); /* FF3.6 */
-	background-image:     -ms-linear-gradient( #666666 /*{a-body-background-start}*/, #222222 /*{a-body-background-end}*/); /* IE10 */
-	background-image:      -o-linear-gradient( #666666 /*{a-body-background-start}*/, #222222 /*{a-body-background-end}*/); /* Opera 11.10+ */
-	background-image:         linear-gradient( #666666 /*{a-body-background-start}*/, #222222 /*{a-body-background-end}*/);	
+	/*background-image: -webkit-gradient(linear, left top, left bottom, from( #666666 *//*{a-body-background-start}*//*), to( #222222 *//*{a-body-background-end}*//*)); *//* Saf4+, Chrome */
+	/*background-image: -webkit-linear-gradient( #666666 *//*{a-body-background-start}*//*, #222222 *//*{a-body-background-end}*//*); *//* Chrome 10+, Saf5.1+ */
+	/*background-image:    -moz-linear-gradient( #666666 *//*{a-body-background-start}*//*, #222222 *//*{a-body-background-end}*//*); *//* FF3.6 */
+	/*background-image:     -ms-linear-gradient( #666666 *//*{a-body-background-start}*//*, #222222 *//*{a-body-background-end}*//*); *//* IE10 */
+	/*background-image:      -o-linear-gradient( #666666 *//*{a-body-background-start}*//*, #222222 *//*{a-body-background-end}*//*); *//* Opera 11.10+ */
+	/*background-image:         linear-gradient( #666666 *//*{a-body-background-start}*//*, #222222 *//*{a-body-background-end}*//*);	*/
 }
 .ui-body-a,
 .ui-body-a input,
