@@ -2,13 +2,14 @@
 <html>
   <head>
   	<title>Google Events Widget [ANTP]</title>
-    <script type="text/javascript" src="jquery.js"></script>
     <link rel="stylesheet" href="jquery.mobile.theme.css" />
-    <link rel="stylesheet" href="jquery.mobile.structure-1.0.1.css" /> 
-	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
-    
-    <script src="calendar.js"></script>
+    <link rel="stylesheet" href="jquery.mobile.structure-1.0.1.css" />
+    <script type="text/javascript" src="jquery.js"></script>
+	<script src="jquery.mobile-1.0.1.min.js"></script>
+    <script src="jquery.utility.js"></script>
     <script src="jquery.xcolor.js"></script>
+
+    <script src="calendar.js"></script>
     <style>
     	body {
     		padding: 0;
@@ -42,90 +43,50 @@
             ajaxEnabled: false
           });
         });
-	
-		//Browser On Load Event
-		$(document).ready(function() { 
-			
-			//Extension Listeners   		    		
-			chrome.extension.onRequest.addListener(
-			    function(request, sender, sendResponse){
-			        switch (request.name){
-			        	case "update":
-			           		updateContent();
-			           		break;
-			     	}
-				}
-			);
 
-			//Custom jQuery Functions
-			$.fn.extend({
-				_msg: function(message, loading) {
-					$(this).append($('<span/>').addClass((loading) ? 'indicator' : 'message').html(message));
-					return this;
-				},
-				_cal_header: function(title, count){
-					//<li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
-					var count = $('<span/>').addClass('ui-li-count').html(count);
-					return $('<li/>').attr('data-role', 'list-divider')
-							.attr('role', 'heading')
-							.html(title).append(count).click(function(){
-                                $(this).nextUntil('li[data-role="list-divider"]').slideToggle();
-                            });
-				},
-				_cal_event: function(title, location, time, url, color){
-					//<li data-corners="false" data-shadow="false" data-icon="false">
-					//	<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
-					//	<a href="index.html">
-					//		<h3 class="ui-li-heading">Event Title</h3>
-					//		<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
-					//		<p class="ui-li-desc event_location">Location</p>
-					//	</a>									
-					//</li>
-					var li = $('<li/>').addClass('event').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','false');
-                    if(location){
-                        console.log(location);
-                    }else{
-                        console.log("no location");
-                    }
+        /*
+            Logging Functions
+         */
+        function log(msg, obj){
+            if(typeof obj === 'undefined' || obj == null){
+                console.log("%s", msg);
+            }else{
+                console.log("%s: %o", msg, obj);
+            }
+        }
+        jQuery.fn.log = function (msg) {
+            log(msg, this);
+            return this;
+        };
 
-					var event_title = $('<h3/>').addClass('ui-li-heading').html(title);
-					var event_time = $('<p/>').addClass('ui-li-aside ui-li-desc').html(time);
-                    console.log("URL:"+url)
-					var event_details = $('<a/>').attr({href:url,target:'_top'}).html(event_title).append(event_time);
-					if(location){
-                        var event_location = $('<p/>').addClass('ui-li-desc event_location').html(location);
-                        event_details.append(event_location);
-                    }
-                    li.append(event_color).append(event_details);
-                    var event_color = $('<span/>').addClass('ui-li-aside ui-btn-inner event_color').css('height', location ? 30 : 20).css('padding', '0').css('background-color', color);
-					li.prepend(event_color);
-                    return li;
-				},
-                appointmentCompare: function (d, c) {
-                    var e = d.start - c.start;
-                    if (e == 0) {
-                        if (d.title < c.title) {
-                            return -1
-                        } else {
-                            if (d.title > c.title) {
-                                return 1
-                            } else {
-                                return 0
-                            }
-                        }
-                    }
-                    return e
+
+        //Browser On Load Event
+		$(document).ready(function() {
+
+            // When anything in localStorage changes
+            $(window).bind('storage', function (e) {
+                log("[Storage Event]");
+                var $cal = $('#events');
+                var widget_notify_user = localStorage.getItem("widget_notify_user") || false;
+
+                if(widget_notify_user){
+                    var msg = localStorage.getItem("widget_notify_user_msg");
+                    localStorage.removeItem("widget_notify_user_msg");
+                    localStorage.removeItem("widget_notify_user");
                 }
-			});
 
+            });
 
-
+            /*
+                Main Update function. Loads the events from the localstorage
+                and displays them.
+             */
 			function updateContent(){
 				var $cal = $('#events');
 
-				console.log("---Current Events---");
 				events = JSON.parse(localStorage.getItem("events"));
-				console.log(events);
+                events == null ? events = [] : true;
+                log("Current Events from storage: ", events);
 				
 				var now = new Date();
 				var eventCount = 0, displayEventWithoutAllDayCount = 0, displayEventCount = 0, nextEventIndex = -1;
@@ -136,14 +97,15 @@
 							.attr('data-theme', 'a')
 							.attr('data-divider-theme', 'c');
 					
-					
-					
-					var displayDayCount = 5, showPast = false, offset = 0;
-					for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 2; index < showDays; index++) {	
+					var displayDayCount = 5, offset = 0;
+					for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
 						
-						offset = offset + index;
+						offset = index;
 						var cStart = new Blz.GData.Date().addDays(offset).resetHours(),
                             cEnd = new Date(cStart.date.getFullYear(), cStart.date.getMonth(), cStart.date.getDate(), 23, 59, 59, 0);
+
+                        log("cStart", cStart.date);
+                        log("cEnd", cEnd);
 
 						var header = getHeaderDateString(cStart);
                         if (offset == 0) header += ' - ' + getResourceString('TODAY');
@@ -234,46 +196,6 @@
 				}
 				return remain;
 			}
-			function Darken( hexColor, factor ){   
-		        if ( factor < 0 ) factor = 0;
-		
-		        var c = hexColor;
-		        if ( c.substr(0,1) == "#" )
-		        {
-		            c = c.substring(1);
-		        }
-		
-		        if ( c.length == 3 || c.length == 6 )
-		        {
-		            var i = c.length / 3;
-		
-		            var f;  // the relative distance from white
-		
-		            var r = parseInt( c.substr(0, i ), 16 );
-		            f = ( factor * r / (256-r) );
-		            r = Math.floor((256 * f) / (f+1));
-		
-		            r = r.toString(16);
-		            if ( r.length == 1 ) r = "0" + r;
-		
-		            var g = parseInt( c.substr(i, i), 16);
-		            f = ( factor * g / (256-g) );
-		            g = Math.floor((256 * f) / (f+1));
-		            g = g.toString(16);
-		            if ( g.length == 1 ) g = "0" + g;
-		
-		            var b = parseInt( c.substr( 2*i, i),16 );
-		            f = ( factor * b / (256-b) );
-		            b = Math.floor((256 * f) / (f+1));
-		            b = b.toString(16);
-		            if ( b.length == 1 ) b = "0" + b;
-		
-		            c =  r+g+b;
-		         }   
-		
-		         return "#" + c;
-		
-		    }
 			function getResourceString(b, a) {
 		        if (typeof (chrome) != "undefined" && typeof (chrome.i18n) != "undefined") {
 		            return chrome.i18n.getMessage(b, a)

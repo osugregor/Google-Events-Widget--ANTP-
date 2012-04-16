@@ -39,13 +39,14 @@
 	var w = Blz.Widget, 
 		gcal = Blz.Google.Calendar,
 		app = MyGoogleCal.Application;
-	
+	//Clear events from storage
+    window.localStorage.removeItem('events');
 	w.initialize();
 	gcal.source = 'shayko-GoogleEventsANTP-1';
 	gcal.useGoogleLogin = (w.getPref('useGoogleApps')!='1') ? false : true;
 	app._offset = 0;
 	app.initialize();
-	
+
 	function update(force) {
 		
 		if (force) {
@@ -55,17 +56,18 @@
 		
 		if (app.isLoginRequesting()) {
 			//TODO send event to widget
-			//$cal._msg(w.getResourceString('NOW_LOGIN'),true);
+            var message= w.getResourceString('NOW_LOGIN');
+            widget_notify_user(message);
 			return;
 		}
 		if (!app.isLogin()) {
 			if (app.isGoogleApps()) {
 				// required client login, go to option
-				$cal._msg(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]));
-			}
-			else {
-				// In Google account, extension will work with browser session. 
-				$cal._msg(w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]));
+                widget_notify_user(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]))
+			}else {
+				// In Google account, extension will work with browser session.
+                var message = w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]);
+                widget_notify_user(message);
 			}
 			return;
 		}
@@ -81,8 +83,8 @@
 			return;
 		}
 		var displayDayCount = w.getPref('displayDayCount'), showPast = (w.getPref('showPast') == '1');
-		for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 2; index < showDays; index++) {
-			var offset = app._offset + index;
+		for (var index = -1, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
+			var offset = index;
 			var cStart = new Blz.GData.Date().addDays(offset).resetHours(), cEnd = cStart.clone().addDays(1);
 			var events = [], cache = app.getAppointments(cStart); // copy the array to add repeaters
 			for (calid in cache.items) {
@@ -90,7 +92,7 @@
 				if (cal && cal.selected) {
 					events = events.concat(cache.items[calid]);
 				} else {
-					w.print('"'+cal.title+'" calendar is not selected.');
+					//w.print('"'+cal.title['#text']+'" calendar is not selected.');
 				}
 			}
 		}
@@ -112,13 +114,22 @@
 		},
 		onMyGoogleCalEventLoaded: function(sender, event) {
 			w.print("background.onMyGoogleCalEventLoaded:"+event.key);
-			update();
+			//update();
 		}
 	};
+
+    function widget_notify_user(msg){
+        localStorage.setItem("widget_notify_user", true);
+        localStorage.setItem("widget_notify_user_msg", msg);
+    }
 		
 	//Update every so often
 	app.addObserver(observer);
 	// update for timer
+    setInterval(function(){
+        console.log("Messgae Sent: Update");
+        widget_notify_user("test");
+    },5*1000);
 	setInterval(function(){update();},45*1000);
 	// update for modified events via 5 min
 	setInterval(function(){update(true);},300*1000);	
