@@ -1,11 +1,10 @@
 <!--
    - For https://chrome.google.com/webstore/detail/mgmiemnjjchgkmgbeljfocdjjnpjnmcg
    -->
+<script src="js/jquery.js"></script>
+<script src="js/ext-core.js"></script>
+<script src="js/calendar.js"></script>
 
-<!-- <script type="text/javascript" src="jquery.js"></script> -->
-<script src="jquery.js"></script>
-<script src="ext-core.js"></script>
-<script src="calendar.js"></script>
 <script type="text/javascript">
 	console.log("Background page loaded.");	
 	// Learn more about poke v2 here:
@@ -39,18 +38,18 @@
 	var w = Blz.Widget, 
 		gcal = Blz.Google.Calendar,
 		app = MyGoogleCal.Application;
-	//Clear events from storage
-    window.localStorage.removeItem('events');
-	w.initialize();
+    window.localStorage.removeItem('events'); //clear events from storage
+	w.initialize(); //sets up widget cookie
 	gcal.source = 'shayko-GoogleEventsANTP-1';
 	gcal.useGoogleLogin = (w.getPref('useGoogleApps')!='1') ? false : true;
-	app._offset = 0;
+	
+	w.setPref("offset", 0);
 	app.initialize();
 
 	function update(force) {
 		
 		if (force) {
-			w.print("background.update: crear cache");
+			w.print("background.update: clear cache");
 			app.retrieveAllCalendar();
 		}
 		

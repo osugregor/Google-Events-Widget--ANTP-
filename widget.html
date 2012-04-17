@@ -2,42 +2,21 @@
 <html>
   <head>
   	<title>Google Events Widget [ANTP]</title>
-    <link rel="stylesheet" href="jquery.mobile.theme.css" />
-    <link rel="stylesheet" href="jquery.mobile.structure-1.0.1.css" />
-    <script type="text/javascript" src="jquery.js"></script>
-	<script src="jquery.mobile-1.0.1.min.js"></script>
-    <script src="jquery.utility.js"></script>
-    <script src="jquery.xcolor.js"></script>
-
-    <script src="calendar.js"></script>
-    <style>
-    	body {
-    		padding: 0;
-    		margin: 0;
-    	}
-		.event_location {
-			font-style: italic;
-			font-size: 10px;
-			margin-top: -3px;
-		}
-		.event_color {
-            float: left;
-			width: 5px;
-			height: 30px; /* With location is 30px, without is 20px */
-			background: red;
-			border-right: 1px solid #222;
-			margin-top: -1px;
-			padding: 0;
-		}
-		#google_logo {
-			background-image: url('Logo_Google-Calendar.png');
-			display: none;
-			height: 225px;
-			width: 300px;
-		}
-    </style>   
+	
+	<!-- CSS Files -->
+    <link rel="stylesheet" href="css/jquery.mobile.theme.css" />
+    <link rel="stylesheet" href="css/jquery.mobile.structure-1.0.1.css" />
+	
+	<!--  JS Files -->
+    <script src="js/jquery.js" type="text/javascript"></script>
+	<script src="js/jquery.mobile-1.0.1.min.js"></script>
+    <script src="js/jquery.utility.js"></script>
+    <script src="js/jquery.xcolor.js"></script>
+	<script src="js/helpers.js"></script>
+    <script src="js/calendar.js"></script>
+	
 	<script>
-
+		
         $(document).bind("mobileinit", function(){
           $.extend(  $.mobile , {
             ajaxEnabled: false
@@ -160,53 +139,7 @@
                 });
             }
 			
-			function getTimeString(date) {
-				if (date) {
-					var use24 = 0;//TODO...FIX w.getPref('use24HourTime');
-					var partOne = date.getHours(), partTwo = date.getMinutes(), amPM = '';
-					if (use24==0) {
-						if (partOne > 12) {
-							partOne = partOne - 12;
-							amPM = ' PM';
-						} else {
-							amPM = (partOne == 12) ? ' PM' : ' AM';
-						}
-						if (partOne == 0) partOne = 12;
-					}
-					if (partTwo < 10) partTwo = '0' + partTwo;
-					return partOne + ':' + partTwo + amPM;
-				}
-				return '';
-			}
-			function getRemainTimeString(date) {
-				var now = new Date();
-				var remain = '', minutes = Math.ceil((date - now) / (60 * 1000));
-				if (minutes == 1) {
-					remain =  getResourceString('TO_GO_MINUTE',[1]); // TBD
-				} else if (minutes < 60) {
-					remain = (minutes > 1) ? getResourceString('TO_GO_MINUTES',[minutes]) : w.getResourceString('TO_GO_MINUTE',[minutes]);
-				} else if (minutes >= 60) {
-					var hours = Math.floor(Number(minutes) / 60);
-					minutes = minutes - 60 * hours;
-					if (hours > 1) {
-						remain = (minutes > 1) ? getResourceString('TO_GO_HOURS_MINUTES',[hours,minutes]) : getResourceString('TO_GO_HOURS_MINUTE',[hours,minutes]);
-					} else {
-						remain = (minutes > 1) ? getResourceString('TO_GO_HOUR_MINUTES',[hours,minutes]) : getResourceString('TO_GO_HOUR_MINUTE',[hours,minutes]);
-					}
-				}
-				return remain;
-			}
-			function getResourceString(b, a) {
-		        if (typeof (chrome) != "undefined" && typeof (chrome.i18n) != "undefined") {
-		            return chrome.i18n.getMessage(b, a)
-		        }
-		        return b
-		    }
-            function getHeaderDateString(date) {
-                var monthNames = getResourceString('SHORTMONTH_NAMES').split(',');
-                var dayNames = getResourceString('SHORTDAY_NAMES').split(',');
-                return getResourceString('HEADER_DATE',[monthNames[date.getMonth()-1],date.getDate(),dayNames[date.getDay()]]);
-            }
+			
 			updateContent();
     	});
     </script>

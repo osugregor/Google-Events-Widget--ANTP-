@@ -1,10 +1,6 @@
 //Custom jQuery Functions
 $.fn.extend({
 
-    _alert: function(message){
-        $("#events").prepend('<a href="foo.html" data-rel="dialog">Open dialog</a>');
-    },
-
     _msg: function(message, loading) {
         $(this).append($('<span/>').addClass((loading) ? 'indicator' : 'message').html(message));
         return this;

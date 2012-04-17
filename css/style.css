@@ -1,0 +1,24 @@
+body {
+	padding: 0;
+	margin: 0;
+}
+.event_location {
+	font-style: italic;
+	font-size: 10px;
+	margin-top: -3px;
+}
+.event_color {
+	float: left;
+	width: 5px;
+	height: 30px; /* With location is 30px, without is 20px */
+	background: red;
+	border-right: 1px solid #222;
+	margin-top: -1px;
+	padding: 0;
+}
+#google_logo {
+	background-image: url('Logo_Google-Calendar.png');
+	display: none;
+	height: 225px;
+	width: 300px;
+}
