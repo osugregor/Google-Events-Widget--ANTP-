@@ -58,45 +58,45 @@
             }
             if (app.isLoginRequesting()) {
                 log("[WARNING] Request Login!");
-                widget_notify_user( w.getResourceString('NOW_LOGIN'));
+                widget_notify( w.getResourceString('NOW_LOGIN'));
                 return;
             }
             if (!app.isLogin()) {
                 log("[WARNING] Not Logged In!");
                 if (app.isGoogleApps()) {
                     // required client login, go to option
-                    widget_notify_user(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]))
+                    widget_notify(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]))
                 }else {
                     // In Google account, extension will work with browser session.
-                    widget_notify_user(w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]));
+                    widget_notify(w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]));
                 }
                 return;
             }
             if (app.isCalendarListRequesting()) {
                 log("[WARNING] Calendar is already requesting.");
-                widget_notify_user("Updating Calendars...");
+                widget_notify("Updating Calendars...");
                 return;
             }
             if (app.gcal.cacheCalendars.length==0){
                 log("[WARNING] No cached calendars");
-                widget_notify_user("No Calendars...");
+                widget_notify("No Calendars...");
                 return;
             }
-            var displayDayCount = (!isNaN(w.getPref('displayDayCount'))) ? w.getPref('displayDayCount') : 5;
-            for (var offset = 0; offset < displayDayCount; offset++) {
-                var cStart = new Blz.GData.Date().addDays(offset).resetHours();
-                var events = [], cache = app.getAppointments(cStart); // copy the array to add repeaters
-                for (calid in cache.items) {
-                    var cal = app.findCalendarById(calid);
-                    if (cal && cal.selected) {
-                        events = events.concat(cache.items[calid]);
-                    } else {
-                        //w.print('"'+cal.title['#text']+'" calendar is not selected.');
-                    }
-                }
-            }
+            var num_days = w.getPref('numDays');num_days = (!isNaN(num_days)) ? num_days : 5;
+			var offset = w.getPref('offset') || 0;
+			var cStart = new Blz.GData.Date().addDays(offset).resetHours();
+			var events = [], cache = app.getAppointments(cStart); // copy the array to add repeaters
+			for (calid in cache.items) {
+				var cal = app.findCalendarById(calid);
+				if (cal && cal.selected) {
+					events = events.concat(cache.items[calid]);
+				} else {
+					//w.print('"'+cal.title['#text']+'" calendar is not selected.');
+				}
+			}
+			
             localStorage.setItem("events", JSON.stringify(events));
-            chrome.extension.sendRequest({name: "update"});
+            widget_notify("update");
         }
 
         var observer = {
@@ -118,19 +118,14 @@
             }
         };
 
-        function widget_notify_user(msg){
-            localStorage.setItem("widget_notify_user", true);
-            localStorage.setItem("widget_notify_user_msg", msg);
+        function widget_notify(msg){
+            localStorage.setItem("widget_notify", true);
+            localStorage.setItem("widget_notify_msg", msg);
         }
 
         //Update every so often
         app.addObserver(observer);
-        // update for timer
-        setInterval(function(){
-            console.log("Message Sent: Update");
-            widget_notify_user("test");
-        },5*1000);
-        setInterval(function(){update();},45*1000);
+        setInterval(function(){update();},60*1000);
         // update for modified events via 5 min
         setInterval(function(){update(true);},300*1000);
     });

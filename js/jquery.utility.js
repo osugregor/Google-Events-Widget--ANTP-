@@ -24,15 +24,8 @@ $.fn.extend({
         //	</a>
         //</li>
         var li = $('<li/>').addClass('event').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','false');
-        if(location){
-            log(location);
-        }else{
-            log("no location");
-        }
-
         var event_title = $('<h3/>').addClass('ui-li-heading').html(title);
         var event_time = $('<p/>').addClass('ui-li-aside ui-li-desc').html(time);
-        log("URL:"+url)
         var event_details = $('<a/>').attr({href:url,target:'_top'}).html(event_title).append(event_time);
         if(location){
             var event_location = $('<p/>').addClass('ui-li-desc event_location').html(location);

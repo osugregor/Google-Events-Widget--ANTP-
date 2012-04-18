@@ -1379,9 +1379,10 @@ MyGoogleCal.Application = {
                     a.items = {};
                     a.loading = true;
                     a.loadingCount = 0;
+					var num_days = n.getPref('numDays');num_days = (!isNaN(num_days)) ? num_days : 5;
                     var f = d.date;
                     var c = new Date(f.getFullYear(), f.getMonth(), f.getDate(), 0, 0, 0, 0);
-                    var h = new Date(f.getFullYear(), f.getMonth(), f.getDate(), 23*3, 59, 59, 0);
+                    var h = new Date(f.getFullYear(), f.getMonth(), f.getDate(), 23 * num_days, 59, 59, 0);
                     var g = {
                         "start-min": Blz.GData.Date.toDateString(c),
                         "start-max": Blz.GData.Date.toDateString(h)

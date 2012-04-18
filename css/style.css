@@ -3,6 +3,17 @@ body {
 	margin: 0;
 }
 
+h1 a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.events_ul {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 371px;
+}
+
 .event_location {
 	font-style: italic;
 	font-size: 10px;
@@ -17,4 +28,32 @@ body {
 	border-right: 1px solid #222;
 	margin-top: -1px;
 	padding: 0;
+}
+
+
+/* Scrollbar theming */
+::-webkit-scrollbar {
+  background: transparent;
+  overflow: visible;
+  width: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #fff;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.8);
+}
+::-webkit-scrollbar-thumb:horizontal {
+  border-width: 4px 4px;
+  min-width: 100px;
+}
+::-webkit-scrollbar-thumb:vertical {
+  border-width: 4px 4px;
+  min-height: 100px;
+}
+::-webkit-scrollbar-track-piece {
+  background-color: #888;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
