@@ -2,6 +2,9 @@ if (typeof (Blz) == "undefined") {
     Blz = {}
 }
 
+/************************************************
+                   Utilities
+ *************************************************/
 Blz.Util = {
     toArray: function (d) {
         if (!d) {
@@ -34,7 +37,377 @@ Blz.Util = {
         return a
     }
 };
+Blz.Ajax = {
+    get: function (a, d, c, b) {
+        Ext.Ajax.request({
+            method: "GET",
+            url: a,
+            params: c,
+            headers: b,
+            callback: function (f, g, e) {
+                d({
+                    success: g,
+                    data: e.responseText,
+                    response: e,
+                    options: f
+                })
+            }
+        })
+    },
+    post: function (b, a, d, c) {
+        Ext.Ajax.request({
+            method: "POST",
+            url: b,
+            params: a,
+            headers: c,
+            callback: function (f, g, e) {
+                d({
+                    success: g,
+                    data: e.responseText,
+                    response: e,
+                    options: f
+                })
+            }
+        })
+    }
+};
 
+/************************************************
+                   Notifier
+ *************************************************/
+Blz.Notifier = {
+    observers: [],
+    notifyMethodPrefix: "",
+    suppressNotifications: 0,
+    addObserver: function (b) {
+        if (!b) {
+            return
+        }
+        for (var c = 0, a = this.observers.length; c < a; c++) {
+            if (this.observers[c] == b) {
+                return
+            }
+        }
+        this.observers[a] = b
+    },
+    removeObserver: function (b) {
+        if (!b) {
+            return
+        }
+        for (var c = 0, a = this.observers.length; c < a; c++) {
+            if (this.observers[c] == b) {
+                this.observers.splice(c, 1);
+                break
+            }
+        }
+    },
+    notifyObservers: function (b, d) {
+        if (!b) {
+            return
+        }
+        b = this.notifyMethodPrefix + b;
+        if (!this.suppressNotifications) {
+            for (var c = 0, a = this.observers.length; c < a; c++) {
+                var e = this.observers[c];
+                if (e) {
+                    if (typeof e == "function") {
+                        e(b, this, d)
+                    } else {
+                        if (e[b]) {
+                            e[b](this, d)
+                        }
+                    }
+                }
+            }
+        }
+    },
+    enableNotifications: function () {
+        if (--this.suppressNotifications < 0) {
+            this.suppressNotifications = 0
+        }
+    },
+    disableNotifications: function () {
+        ++this.suppressNotifications
+    }
+};
+
+/************************************************
+                    XML Parser
+ *************************************************/
+Blz.XML = {};
+Blz.XML.Parser = {
+    string2object: function (a) {
+        var b = new Blz.XML.SimpleElement();
+        return b.parse(a)
+    },
+    file2object: function (b) {
+        var a = filesystem.readFile(b);
+        return this.string2object(a)
+    }
+};
+Blz.XML.SimpleElement = function (a) {
+    this.initialize(a)
+};
+Blz.XML.SimpleElement.prototype = {
+    initialize: function (a) {
+        this.attr_prefix = "-";
+        this.isarray = true;
+        if (a) {
+            this.parse(a)
+        }
+    },
+    parse: function (c) {
+        var b, a;
+        if (typeof (window) != "undefined" && window.DOMParser) {
+            this.attr_prefix = "";
+            a = new DOMParser();
+            var d = a.parseFromString(c, "application/xml");
+            if (!d) {
+                return
+            }
+            b = d.documentElement
+        } else {
+            if (typeof (window) != "undefined" && window.ActiveXObject) {
+                a = new ActiveXObject("Microsoft.XMLDOM");
+                a.async = false;
+                a.loadXML(c);
+                b = a.documentElement
+            } else {
+                if (typeof (XMLDOM) != "undefined" && XMLDOM) {
+                    this.attr_prefix = "";
+                    a = XMLDOM.parse(c);
+                    b = a.documentElement;
+                    this.isarray = false
+                }
+            }
+        }
+        if (!b) {
+            return
+        }
+        return this.parseDOM(b)
+    },
+    parseDOM: function (a) {
+        if (!a) {
+            return
+        }
+        this.__force_array = {};
+        if (this.force_array) {
+            for (var c = 0; c < this.force_array.length; c++) {
+                this.__force_array[this.force_array[c]] = 1
+            }
+        }
+        var b = this.parseElement(a);
+        if (this.__force_array[a.nodeName]) {
+            b = [b]
+        }
+        return b
+    },
+    parseElement: function (e) {
+        if (e.nodeType == 7) {
+            return
+        }
+        if (e.nodeType == 3 || e.nodeType == 4) {
+            var f = e.nodeValue.match(/[^\x00-\x20]/);
+            if (f == null) {
+                return
+            }
+            return e.nodeValue
+        }
+        var b;
+        var d = {};
+        if (e.attributes && e.attributes.length) {
+            b = {};
+            for (var g = 0; g < e.attributes.length; g++) {
+                var j = (this.isarray) ? e.attributes[g].nodeName : e.attributes.item(g).nodeName;
+                if (typeof (j) != "string") {
+                    continue
+                }
+                var c = (this.isarray) ? e.attributes[g].nodeValue : e.attributes.item(g).nodeValue;
+                if (!c) {
+                    continue
+                }
+                j = this.attr_prefix + j;
+                if (typeof (d[j]) == "undefined") {
+                    d[j] = 0
+                }
+                d[j]++;
+                this.addNode(b, j, d[j], c)
+            }
+        }
+        if (e.childNodes && e.childNodes.length) {
+            var h = true;
+            if (b) {
+                h = false
+            }
+            for (var g = 0; g < e.childNodes.length && h; g++) {
+                var a = (this.isarray) ? e.childNodes[g].nodeType : e.childNodes.item(g).nodeType;
+                if (a == 3 || a == 4) {
+                    continue
+                }
+                h = false
+            }
+            if (h) {
+                if (!b) {
+                    b = ""
+                }
+                for (var g = 0; g < e.childNodes.length; g++) {
+                    b += (this.isarray) ? e.childNodes[g].nodeValue : e.childNodes.item(g).nodeValue
+                }
+            } else {
+                if (!b) {
+                    b = {}
+                }
+                for (var g = 0; g < e.childNodes.length; g++) {
+                    var j = (this.isarray) ? e.childNodes[g].nodeName : e.childNodes.item(g).nodeName;
+                    if (typeof (j) != "string") {
+                        continue
+                    }
+                    var c = (this.isarray) ? this.parseElement(e.childNodes[g]) : this.parseElement(e.childNodes.item(g));
+                    if (!c) {
+                        continue
+                    }
+                    if (typeof (d[j]) == "undefined") {
+                        d[j] = 0
+                    }
+                    d[j]++;
+                    this.addNode(b, j, d[j], c)
+                }
+            }
+        }
+        return b
+    },
+    addNode: function (c, a, b, d) {
+        if (this.__force_array[a]) {
+            if (b == 1) {
+                c[a] = []
+            }
+            c[a][c[a].length] = d
+        } else {
+            if (b == 1) {
+                c[a] = d
+            } else {
+                if (b == 2) {
+                    c[a] = [c[a], d]
+                } else {
+                    c[a][c[a].length] = d
+                }
+            }
+        }
+    },
+    scalar2xml: function (a, b) {
+        if (a == "#text") {
+            return this.escape(b)
+        } else {
+            return "<" + a + ">" + this.escape(b) + "</" + a + ">\n"
+        }
+    },
+    array2xml: function (b, e) {
+        var a = [];
+        for (var c = 0; c < e.length; c++) {
+            var d = e[c];
+            if (typeof (d) == "undefined" || d == null) {
+                a[a.length] = "<" + b + " />"
+            } else {
+                if (typeof (d) == "object" && d.constructor == Array) {
+                    a[a.length] = this.array2xml(b, d)
+                } else {
+                    if (typeof (d) == "object") {
+                        a[a.length] = this.hash2xml(b, d)
+                    } else {
+                        a[a.length] = this.scalar2xml(b, d)
+                    }
+                }
+            }
+        }
+        return a.join("")
+    },
+    hash2xml: function (c, b) {
+        var f = [];
+        var a = [];
+        for (var e in b) {
+            if (!b.hasOwnProperty(e)) {
+                continue
+            }
+            var h = b[e];
+            if (e.charAt(0) != this.attr_prefix) {
+                if (typeof (h) == "undefined" || h == null) {
+                    f[f.length] = "<" + e + " />"
+                } else {
+                    if (typeof (h) == "object" && h.constructor == Array) {
+                        f[f.length] = this.array2xml(e, h)
+                    } else {
+                        if (typeof (h) == "object") {
+                            f[f.length] = this.hash2xml(e, h)
+                        } else {
+                            f[f.length] = this.scalar2xml(e, h)
+                        }
+                    }
+                }
+            } else {
+                a[a.length] = " " + (e.substring(1)) + '="' + (this.xml_escape(h)) + '"'
+            }
+        }
+        var g = a.join("");
+        var d = f.join("");
+        if (typeof (c) == "undefined" || c == null) {} else {
+            if (f.length > 0) {
+                if (d.match(/\n/)) {
+                    d = "<" + c + g + ">\n" + d + "</" + c + ">\n"
+                } else {
+                    d = "<" + c + g + ">" + d + "</" + c + ">\n"
+                }
+            } else {
+                d = "<" + c + g + " />\n"
+            }
+        }
+        return d
+    },
+    escape: function (a) {
+        return String(a).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+    }
+};
+
+/************************************************
+ Version
+ *************************************************/
+Blz.Version = function (b, d, c, a) {
+    this.major = (b != null) ? b : 0;
+    this.minor = (d != null) ? d : 0;
+    this.revision = (c != null) ? c : 0;
+    this.buildNumber = (a != null) ? a : 0
+};
+Blz.Version.prototype = {
+    parse: function (b) {
+        var a = b.split(".");
+        switch (a.length) {
+            case 4:
+                this.buildNumber = a[3];
+            case 3:
+                this.revision = a[2];
+            case 2:
+                this.minor = a[1];
+            case 1:
+                this.major = a[0];
+                break
+        }
+    },
+    toString: function () {
+        return [this.major, this.minor, this.revision, this.buildNumber].join(".")
+    },
+    compare: function (a) {
+        if (this.major == a.major && this.minor == a.minor && this.revision == a.revision && this.buildNumber == a.buildNumber) {
+            return 0
+        }
+        if ((this.major < a.major) || (this.major == a.major && this.minor < a.minor) || (this.major == a.major && this.minor == a.minor && this.revision < a.revision) || (this.major == a.major && this.minor == a.minor && this.revision == a.revision && this.buildNumber < a.buildNumber)) {
+            return -1
+        }
+        return 1
+    }
+};
+
+/************************************************
+                  Google Data
+ *************************************************/
 Blz.GData = {
     source: "",
     hasSession: false,
@@ -166,6 +539,186 @@ Blz.GData = {
 Blz.Util.extend(Blz.GData, Blz.Notifier);
 
 /************************************************
+ GData Date
+ *************************************************/
+Blz.GData.Date = function (b, a) {
+    this.date = b || new Date();
+    this.dateOnly = a === true;
+    return this
+};
+Blz.Util.extend(Blz.GData.Date, {
+    fromIso8601: function (g) {
+        var j = parseInt(g.substring(0, 4), 10),
+            h = parseInt(g.substring(5, 7), 10) - 1,
+            m = parseInt(g.substring(8, 10), 10);
+        if (g.toUpperCase().indexOf("T") == -1) {
+            return new Blz.GData.Date(new Date(j, h, m), true)
+        }
+        var k = parseInt(g.substring(11, 13), 10),
+            c = parseInt(g.substring(14, 16), 10),
+            l = parseInt(g.substring(17, 19), 10),
+            b = parseInt(g.substring(20, 23), 10),
+            i = new Date(j, h, m, k, c, l, b);
+        if (g.length > 23) {
+            var f = 0,
+                e = g.charAt(23);
+            if (e !== "Z") {
+                var n = parseInt(g.substring(24, 26), 10),
+                    a = parseInt(g.substring(27, 29), 10);
+                f = n * 60 + a;
+                if (e !== "-") {
+                    f = -f
+                }
+            }
+            f -= i.getTimezoneOffset();
+            if (f != 0) {
+                i.setTime(i.getTime() + f * 60000)
+            }
+        }
+        return new Blz.GData.Date(i)
+    },
+    padNumber: function (c, b) {
+        var a = c.toString();
+        while (a.length < b) {
+            a = "0" + a
+        }
+        return a
+    },
+    getTimezoneOffsetString: function (b) {
+        var f, d = b.getTimezoneOffset();
+        if (d == 0) {
+            f = "Z"
+        } else {
+            var e = Math.abs(d) / 60,
+                c = Math.floor(e),
+                a = (e - c) * 60;
+            f = (d > 0 ? "-" : "+") + this.padNumber(c, 2) + ":" + this.padNumber(a, 2)
+        }
+        return f
+    },
+    toIso8601: function (d) {
+        var c = d instanceof Blz.GData.Date,
+            b = c ? d.date : d,
+            a = b.getFullYear() + "-" + this.padNumber(b.getMonth() + 1, 2) + "-" + this.padNumber(b.getDate(), 2);
+        if (c && d.isDateOnly()) {
+            return a
+        }
+        return a + "T" + this.padNumber(b.getHours(), 2) + ":" + this.padNumber(b.getMinutes(), 2) + ":" + this.padNumber(b.getSeconds(), 2) + "." + this.padNumber(b.getMilliseconds(), 3) + this.getTimezoneOffsetString(b)
+    },
+    toDateString: function (b) {
+        b = b || this.date;
+        var j = b.getFullYear(),
+            c = b.getMonth() + 1,
+            i = b.getDate();
+        var k = b.getHours(),
+            f = b.getMinutes(),
+            h = b.getSeconds();
+        if (c < 10) {
+            c = "0" + c
+        }
+        if (i < 10) {
+            i = "0" + i
+        }
+        if (k < 10) {
+            k = "0" + k
+        }
+        if (f < 10) {
+            f = "0" + f
+        }
+        if (h < 10) {
+            h = "0" + h
+        }
+        var e = b.getTimezoneOffset();
+        if (e == 0) {
+            e = ""
+        } else {
+            var l = e / 60;
+            var g = e % 60;
+            var a = (l > 0) ? "-" : "+";
+            if (l < 0) {
+                l *= -1
+            }
+            if (l < 10) {
+                l = "0" + l
+            }
+            if (g < 10) {
+                g = "0" + g
+            }
+            e = a + l + ":" + g
+        }
+        return j + "-" + c + "-" + i + "T" + k + ":" + f + ":" + h + e
+    }
+});
+Blz.GData.Date.prototype = {
+    addDays: function (b) {
+        var a = this.date.getTime() + (24 * 3600000 * b);
+        this.date.setTime(a);
+        return this
+    },
+    getYear: function () {
+        return this.date.getFullYear()
+    },
+    getMonth: function () {
+        return this.date.getMonth() + 1
+    },
+    getDate: function () {
+        return this.date.getDate()
+    },
+    getDay: function () {
+        return this.date.getDay()
+    },
+    isWeekend: function () {
+        return (this.getDay() == 0 || this.getDay() == 6) ? true : false
+    },
+    isDateOnly: function () {
+        return this.dateOnly
+    },
+    setDateOnly: function (a) {
+        this.dateOnly = a
+    },
+    resetHours: function () {
+        this.date.setHours(0, 0, 0, 0);
+        return this
+    },
+    clone: function () {
+        return new Blz.GData.Date(new Date(this.date))
+    },
+    asDate: function () {
+        return new Date(this.date)
+    },
+    compare: function (a) {
+        return (this.date - a.date)
+    },
+    toKeyString: function () {
+        return this.toString()
+    },
+    toString: function () {
+        var c = this.getYear(),
+            a = this.getMonth(),
+            b = this.getDate();
+        a = (a < 10) ? "0" + a : "" + a;
+        b = (b < 10) ? "0" + b : "" + b;
+        return "" + c + "-" + a + "-" + b
+    },
+    toLocaleShortString: function () {
+        var h = this.getYear(),
+            b = this.getMonth(),
+            g = this.getDate();
+        var e = Boolean(new Date("27/12/2004").getDay());
+        var a = Boolean(new Date("12/27/2004").getDay());
+        Blz.Widget.print("UKdate = " + e);
+        Blz.Widget.print("USdate = " + a);
+        var f = !+new Date("32/12/1969 Z");
+        var c = !+new Date("12/32/1969 Z");
+        Blz.Widget.print("UKtype = " + f);
+        Blz.Widget.print("UStype = " + c);
+        b = (b < 10) ? "0" + b : "" + b;
+        g = (g < 10) ? "0" + g : "" + g;
+        return (e) ? "" + g + "/" + b + "/" + h : "" + b + "/" + g + "/" + h
+    }
+};
+
+/************************************************
 					Google Cal
 *************************************************/
 if (typeof (Blz.Google) == "undefined") {
@@ -218,18 +771,19 @@ Blz.Google.Calendar = {
         var f = {};
         var e = this.getAuthHeader();
         this.isCalendarListRequesting = true;
-		console.log("RETREIVING CALENDAR");
+
+        Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar --Sending Request--");
         Blz.Ajax.get(b, function (h) {
             try {
                 d.isCalendarListRequesting = false;
-				console.log("Retreived:");
-				console(h);
+                Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar --Request Received--");
+                Blz.Widget.debug(h);
                 var j = h.response,
                     i = h.success,
                     g = h.data,
                     k = [];
                 if (j.status != 200) {
-                    a.print("Blz.Google.Calendar.retrieveCalendar: Http Status = " + j.status)
+                    a.print("[WARNING] Blz.Google.Calendar.retrieveCalendar: Http Status = " + j.status)
                 }
                 if (i) {
                     k = d.parseCalendars(g)
@@ -242,7 +796,7 @@ Blz.Google.Calendar = {
                     items: k
                 })
             } catch (h) {
-                Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar:" + h)
+                Blz.Widget.print("[ERROR] Blz.Google.Calendar.retrieveCalendar:" + h)
             }
         }, f, e)
     },
@@ -261,7 +815,7 @@ Blz.Google.Calendar = {
                 g.push(f)
             }
         } catch (e) {
-            h.print("Blz.Google.Calendar.parseCalendars:" + e)
+            h.print("[ERROR] Blz.Google.Calendar.parseCalendars:" + e)
         }
         this.cacheCalendars = g;
         return g
@@ -281,7 +835,7 @@ Blz.Google.Calendar = {
             b = j["gCal:selected"]["value"] != "false" || false;
             f = j["gCal:hidden"]["value"] != "false" || false
         } catch (g) {
-            Blz.Widget.print("Blz.Google.Calendar.createCalendar: " + g)
+            Blz.Widget.print("[ERROR] Blz.Google.Calendar.createCalendar: " + g)
         }
         return {
             id: i,
@@ -595,15 +1149,9 @@ Blz.Widget = {
     reload: function () {},
     showPref: function () {},
     setPref: function (a, b) {},
-    getPref: function (a) {
-        return "bb"
-    },
-    getResourceString: function (a) {
-        return ""
-    },
-    getMenuSeparatorTitle: function () {
-        return ""
-    }
+    getPref: function (a) { return "bb"; },
+    getResourceString: function (a) { return ""; },
+    getMenuSeparatorTitle: function () { return ""; }
 };
 Blz.Util.extend(Blz.Widget, {
     initialize: function () {
@@ -630,7 +1178,7 @@ Blz.Util.extend(Blz.Widget, {
         console.log("[DEBUG] %o", a);
     },
     print: function (a) {
-        console.log(a)
+        console.log("(BLZ) " + a)
     },
     connectComObject: function (a, b) {},
     createComObject: function (a) {
@@ -670,14 +1218,8 @@ Blz.Util.extend(Blz.Widget, {
 });
 
 
-
-
 /************************************************
- ************************************************
- ************************************************
 			 Google Cal Application
- ************************************************
- ************************************************
 *************************************************/
 var MyGoogleCal = {};
 MyGoogleCal.Application = {
@@ -870,19 +1412,17 @@ MyGoogleCal.Application = {
     },
     onGoogleCalendarLoginCompleted: function (b, c) {
         var a = Blz.Widget;
-        a.print("MyGoogleCal.Application.onGoogleCalendarLoginCompleted:" + c.success);
-        this.notifyObservers("LoginCompleted", c)
-        console.log(b)
-        console.log(c)
+        a.print("[EVENT] MyGoogleCal.Application.onGoogleCalendarLoginCompleted:" + c.success);
+        this.notifyObservers("LoginCompleted", c);
     },
     onGoogleCalendarCalendarRetrieved: function (b, c) {
         var a = Blz.Widget;
-        a.print("MyGoogleCal.Application.onGoogleCalendarRetrieved: calendar count = " + c.items.length);
+        a.print("[EVENT] MyGoogleCal.Application.onGoogleCalendarRetrieved: calendar count = " + c.items.length);
         this.notifyObservers("CalendarLoaded", c)
     },
     onGoogleCalendarEventRetrieved: function (d, b) {
         var h = Blz.Widget;
-        h.print("MyGoogleCal.Application.onGoogleCalendarEventRetrieved: event count = " + b.items.length);
+        h.print("[EVENT] MyGoogleCal.Application.onGoogleCalendarEventRetrieved: event count = " + b.items.length);
         try {
             var c = b.context;
             var i = c.dt;
@@ -904,558 +1444,3 @@ MyGoogleCal.Application = {
     }
 };
 Blz.Util.extend(MyGoogleCal.Application, Blz.Notifier);
-
-
-
-
-
-
-
-
-/************************************************
-					GData Date
-*************************************************/
-
-Blz.GData.Date = function (b, a) {
-    this.date = b || new Date();
-    this.dateOnly = a === true;
-    return this
-};
-Blz.Util.extend(Blz.GData.Date, {
-    fromIso8601: function (g) {
-        var j = parseInt(g.substring(0, 4), 10),
-            h = parseInt(g.substring(5, 7), 10) - 1,
-            m = parseInt(g.substring(8, 10), 10);
-        if (g.toUpperCase().indexOf("T") == -1) {
-            return new Blz.GData.Date(new Date(j, h, m), true)
-        }
-        var k = parseInt(g.substring(11, 13), 10),
-            c = parseInt(g.substring(14, 16), 10),
-            l = parseInt(g.substring(17, 19), 10),
-            b = parseInt(g.substring(20, 23), 10),
-            i = new Date(j, h, m, k, c, l, b);
-        if (g.length > 23) {
-            var f = 0,
-                e = g.charAt(23);
-            if (e !== "Z") {
-                var n = parseInt(g.substring(24, 26), 10),
-                    a = parseInt(g.substring(27, 29), 10);
-                f = n * 60 + a;
-                if (e !== "-") {
-                    f = -f
-                }
-            }
-            f -= i.getTimezoneOffset();
-            if (f != 0) {
-                i.setTime(i.getTime() + f * 60000)
-            }
-        }
-        return new Blz.GData.Date(i)
-    },
-    padNumber: function (c, b) {
-        var a = c.toString();
-        while (a.length < b) {
-            a = "0" + a
-        }
-        return a
-    },
-    getTimezoneOffsetString: function (b) {
-        var f, d = b.getTimezoneOffset();
-        if (d == 0) {
-            f = "Z"
-        } else {
-            var e = Math.abs(d) / 60,
-                c = Math.floor(e),
-                a = (e - c) * 60;
-            f = (d > 0 ? "-" : "+") + this.padNumber(c, 2) + ":" + this.padNumber(a, 2)
-        }
-        return f
-    },
-    toIso8601: function (d) {
-        var c = d instanceof Blz.GData.Date,
-            b = c ? d.date : d,
-            a = b.getFullYear() + "-" + this.padNumber(b.getMonth() + 1, 2) + "-" + this.padNumber(b.getDate(), 2);
-        if (c && d.isDateOnly()) {
-            return a
-        }
-        return a + "T" + this.padNumber(b.getHours(), 2) + ":" + this.padNumber(b.getMinutes(), 2) + ":" + this.padNumber(b.getSeconds(), 2) + "." + this.padNumber(b.getMilliseconds(), 3) + this.getTimezoneOffsetString(b)
-    },
-    toDateString: function (b) {
-        b = b || this.date;
-        var j = b.getFullYear(),
-            c = b.getMonth() + 1,
-            i = b.getDate();
-        var k = b.getHours(),
-            f = b.getMinutes(),
-            h = b.getSeconds();
-        if (c < 10) {
-            c = "0" + c
-        }
-        if (i < 10) {
-            i = "0" + i
-        }
-        if (k < 10) {
-            k = "0" + k
-        }
-        if (f < 10) {
-            f = "0" + f
-        }
-        if (h < 10) {
-            h = "0" + h
-        }
-        var e = b.getTimezoneOffset();
-        if (e == 0) {
-            e = ""
-        } else {
-            var l = e / 60;
-            var g = e % 60;
-            var a = (l > 0) ? "-" : "+";
-            if (l < 0) {
-                l *= -1
-            }
-            if (l < 10) {
-                l = "0" + l
-            }
-            if (g < 10) {
-                g = "0" + g
-            }
-            e = a + l + ":" + g
-        }
-        return j + "-" + c + "-" + i + "T" + k + ":" + f + ":" + h + e
-    }
-});
-Blz.GData.Date.prototype = {
-    addDays: function (b) {
-        var a = this.date.getTime() + (24 * 3600000 * b);
-        this.date.setTime(a);
-        return this
-    },
-    getYear: function () {
-        return this.date.getFullYear()
-    },
-    getMonth: function () {
-        return this.date.getMonth() + 1
-    },
-    getDate: function () {
-        return this.date.getDate()
-    },
-    getDay: function () {
-        return this.date.getDay()
-    },
-    isWeekend: function () {
-        return (this.getDay() == 0 || this.getDay() == 6) ? true : false
-    },
-    isDateOnly: function () {
-        return this.dateOnly
-    },
-    setDateOnly: function (a) {
-        this.dateOnly = a
-    },
-    resetHours: function () {
-        this.date.setHours(0, 0, 0, 0);
-        return this
-    },
-    clone: function () {
-        return new Blz.GData.Date(new Date(this.date))
-    },
-    asDate: function () {
-        return new Date(this.date)
-    },
-    compare: function (a) {
-        return (this.date - a.date)
-    },
-    toKeyString: function () {
-        return this.toString()
-    },
-    toString: function () {
-        var c = this.getYear(),
-            a = this.getMonth(),
-            b = this.getDate();
-        a = (a < 10) ? "0" + a : "" + a;
-        b = (b < 10) ? "0" + b : "" + b;
-        return "" + c + "-" + a + "-" + b
-    },
-    toLocaleShortString: function () {
-        var h = this.getYear(),
-            b = this.getMonth(),
-            g = this.getDate();
-        var e = Boolean(new Date("27/12/2004").getDay());
-        var a = Boolean(new Date("12/27/2004").getDay());
-        Blz.Widget.print("UKdate = " + e);
-        Blz.Widget.print("USdate = " + a);
-        var f = !+new Date("32/12/1969 Z");
-        var c = !+new Date("12/32/1969 Z");
-        Blz.Widget.print("UKtype = " + f);
-        Blz.Widget.print("UStype = " + c);
-        b = (b < 10) ? "0" + b : "" + b;
-        g = (g < 10) ? "0" + g : "" + g;
-        return (e) ? "" + g + "/" + b + "/" + h : "" + b + "/" + g + "/" + h
-    }
-};
-
-
-
-/************************************************
-					XML Parser
-*************************************************/
-
-
-Blz.XML = {};
-Blz.XML.Parser = {
-    string2object: function (a) {
-        var b = new Blz.XML.SimpleElement();
-        return b.parse(a)
-    },
-    file2object: function (b) {
-        var a = filesystem.readFile(b);
-        return this.string2object(a)
-    }
-};
-Blz.XML.SimpleElement = function (a) {
-    this.initialize(a)
-};
-Blz.XML.SimpleElement.prototype = {
-    initialize: function (a) {
-        this.attr_prefix = "-";
-        this.isarray = true;
-        if (a) {
-            this.parse(a)
-        }
-    },
-    parse: function (c) {
-        var b, a;
-        if (typeof (window) != "undefined" && window.DOMParser) {
-            this.attr_prefix = "";
-            a = new DOMParser();
-            var d = a.parseFromString(c, "application/xml");
-            if (!d) {
-                return
-            }
-            b = d.documentElement
-        } else {
-            if (typeof (window) != "undefined" && window.ActiveXObject) {
-                a = new ActiveXObject("Microsoft.XMLDOM");
-                a.async = false;
-                a.loadXML(c);
-                b = a.documentElement
-            } else {
-                if (typeof (XMLDOM) != "undefined" && XMLDOM) {
-                    this.attr_prefix = "";
-                    a = XMLDOM.parse(c);
-                    b = a.documentElement;
-                    this.isarray = false
-                }
-            }
-        }
-        if (!b) {
-            return
-        }
-        return this.parseDOM(b)
-    },
-    parseDOM: function (a) {
-        if (!a) {
-            return
-        }
-        this.__force_array = {};
-        if (this.force_array) {
-            for (var c = 0; c < this.force_array.length; c++) {
-                this.__force_array[this.force_array[c]] = 1
-            }
-        }
-        var b = this.parseElement(a);
-        if (this.__force_array[a.nodeName]) {
-            b = [b]
-        }
-        return b
-    },
-    parseElement: function (e) {
-        if (e.nodeType == 7) {
-            return
-        }
-        if (e.nodeType == 3 || e.nodeType == 4) {
-            var f = e.nodeValue.match(/[^\x00-\x20]/);
-            if (f == null) {
-                return
-            }
-            return e.nodeValue
-        }
-        var b;
-        var d = {};
-        if (e.attributes && e.attributes.length) {
-            b = {};
-            for (var g = 0; g < e.attributes.length; g++) {
-                var j = (this.isarray) ? e.attributes[g].nodeName : e.attributes.item(g).nodeName;
-                if (typeof (j) != "string") {
-                    continue
-                }
-                var c = (this.isarray) ? e.attributes[g].nodeValue : e.attributes.item(g).nodeValue;
-                if (!c) {
-                    continue
-                }
-                j = this.attr_prefix + j;
-                if (typeof (d[j]) == "undefined") {
-                    d[j] = 0
-                }
-                d[j]++;
-                this.addNode(b, j, d[j], c)
-            }
-        }
-        if (e.childNodes && e.childNodes.length) {
-            var h = true;
-            if (b) {
-                h = false
-            }
-            for (var g = 0; g < e.childNodes.length && h; g++) {
-                var a = (this.isarray) ? e.childNodes[g].nodeType : e.childNodes.item(g).nodeType;
-                if (a == 3 || a == 4) {
-                    continue
-                }
-                h = false
-            }
-            if (h) {
-                if (!b) {
-                    b = ""
-                }
-                for (var g = 0; g < e.childNodes.length; g++) {
-                    b += (this.isarray) ? e.childNodes[g].nodeValue : e.childNodes.item(g).nodeValue
-                }
-            } else {
-                if (!b) {
-                    b = {}
-                }
-                for (var g = 0; g < e.childNodes.length; g++) {
-                    var j = (this.isarray) ? e.childNodes[g].nodeName : e.childNodes.item(g).nodeName;
-                    if (typeof (j) != "string") {
-                        continue
-                    }
-                    var c = (this.isarray) ? this.parseElement(e.childNodes[g]) : this.parseElement(e.childNodes.item(g));
-                    if (!c) {
-                        continue
-                    }
-                    if (typeof (d[j]) == "undefined") {
-                        d[j] = 0
-                    }
-                    d[j]++;
-                    this.addNode(b, j, d[j], c)
-                }
-            }
-        }
-        return b
-    },
-    addNode: function (c, a, b, d) {
-        if (this.__force_array[a]) {
-            if (b == 1) {
-                c[a] = []
-            }
-            c[a][c[a].length] = d
-        } else {
-            if (b == 1) {
-                c[a] = d
-            } else {
-                if (b == 2) {
-                    c[a] = [c[a], d]
-                } else {
-                    c[a][c[a].length] = d
-                }
-            }
-        }
-    },
-    scalar2xml: function (a, b) {
-        if (a == "#text") {
-            return this.escape(b)
-        } else {
-            return "<" + a + ">" + this.escape(b) + "</" + a + ">\n"
-        }
-    },
-    array2xml: function (b, e) {
-        var a = [];
-        for (var c = 0; c < e.length; c++) {
-            var d = e[c];
-            if (typeof (d) == "undefined" || d == null) {
-                a[a.length] = "<" + b + " />"
-            } else {
-                if (typeof (d) == "object" && d.constructor == Array) {
-                    a[a.length] = this.array2xml(b, d)
-                } else {
-                    if (typeof (d) == "object") {
-                        a[a.length] = this.hash2xml(b, d)
-                    } else {
-                        a[a.length] = this.scalar2xml(b, d)
-                    }
-                }
-            }
-        }
-        return a.join("")
-    },
-    hash2xml: function (c, b) {
-        var f = [];
-        var a = [];
-        for (var e in b) {
-            if (!b.hasOwnProperty(e)) {
-                continue
-            }
-            var h = b[e];
-            if (e.charAt(0) != this.attr_prefix) {
-                if (typeof (h) == "undefined" || h == null) {
-                    f[f.length] = "<" + e + " />"
-                } else {
-                    if (typeof (h) == "object" && h.constructor == Array) {
-                        f[f.length] = this.array2xml(e, h)
-                    } else {
-                        if (typeof (h) == "object") {
-                            f[f.length] = this.hash2xml(e, h)
-                        } else {
-                            f[f.length] = this.scalar2xml(e, h)
-                        }
-                    }
-                }
-            } else {
-                a[a.length] = " " + (e.substring(1)) + '="' + (this.xml_escape(h)) + '"'
-            }
-        }
-        var g = a.join("");
-        var d = f.join("");
-        if (typeof (c) == "undefined" || c == null) {} else {
-            if (f.length > 0) {
-                if (d.match(/\n/)) {
-                    d = "<" + c + g + ">\n" + d + "</" + c + ">\n"
-                } else {
-                    d = "<" + c + g + ">" + d + "</" + c + ">\n"
-                }
-            } else {
-                d = "<" + c + g + " />\n"
-            }
-        }
-        return d
-    },
-    escape: function (a) {
-        return String(a).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-    }
-};
-
-
-
-Blz.Ajax = {
-    get: function (a, d, c, b) {
-        Ext.Ajax.request({
-            method: "GET",
-            url: a,
-            params: c,
-            headers: b,
-            callback: function (f, g, e) {
-                d({
-                    success: g,
-                    data: e.responseText,
-                    response: e,
-                    options: f
-                })
-            }
-        })
-    },
-    post: function (b, a, d, c) {
-        Ext.Ajax.request({
-            method: "POST",
-            url: b,
-            params: a,
-            headers: c,
-            callback: function (f, g, e) {
-                d({
-                    success: g,
-                    data: e.responseText,
-                    response: e,
-                    options: f
-                })
-            }
-        })
-    }
-};
-
-Blz.Notifier = {
-    observers: [],
-    notifyMethodPrefix: "",
-    suppressNotifications: 0,
-    addObserver: function (b) {
-        if (!b) {
-            return
-        }
-        for (var c = 0, a = this.observers.length; c < a; c++) {
-            if (this.observers[c] == b) {
-                return
-            }
-        }
-        this.observers[a] = b
-    },
-    removeObserver: function (b) {
-        if (!b) {
-            return
-        }
-        for (var c = 0, a = this.observers.length; c < a; c++) {
-            if (this.observers[c] == b) {
-                this.observers.splice(c, 1);
-                break
-            }
-        }
-    },
-    notifyObservers: function (b, d) {
-        if (!b) {
-            return
-        }
-        b = this.notifyMethodPrefix + b;
-        if (!this.suppressNotifications) {
-            for (var c = 0, a = this.observers.length; c < a; c++) {
-                var e = this.observers[c];
-                if (e) {
-                    if (typeof e == "function") {
-                        e(b, this, d)
-                    } else {
-                        if (e[b]) {
-                            e[b](this, d)
-                        }
-                    }
-                }
-            }
-        }
-    },
-    enableNotifications: function () {
-        if (--this.suppressNotifications < 0) {
-            this.suppressNotifications = 0
-        }
-    },
-    disableNotifications: function () {
-        ++this.suppressNotifications
-    }
-};
-Blz.Version = function (b, d, c, a) {
-    this.major = (b != null) ? b : 0;
-    this.minor = (d != null) ? d : 0;
-    this.revision = (c != null) ? c : 0;
-    this.buildNumber = (a != null) ? a : 0
-};
-Blz.Version.prototype = {
-    parse: function (b) {
-        var a = b.split(".");
-        switch (a.length) {
-        case 4:
-            this.buildNumber = a[3];
-        case 3:
-            this.revision = a[2];
-        case 2:
-            this.minor = a[1];
-        case 1:
-            this.major = a[0];
-            break
-        }
-    },
-    toString: function () {
-        return [this.major, this.minor, this.revision, this.buildNumber].join(".")
-    },
-    compare: function (a) {
-        if (this.major == a.major && this.minor == a.minor && this.revision == a.revision && this.buildNumber == a.buildNumber) {
-            return 0
-        }
-        if ((this.major < a.major) || (this.major == a.major && this.minor < a.minor) || (this.major == a.major && this.minor == a.minor && this.revision < a.revision) || (this.major == a.major && this.minor == a.minor && this.revision == a.revision && this.buildNumber < a.buildNumber)) {
-            return -1
-        }
-        return 1
-    }
-};

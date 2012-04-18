@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
   	<title>Google Events Widget [ANTP]</title>
 	
 	<!-- CSS Files -->
@@ -13,9 +13,11 @@
     <script src="js/jquery.utility.js"></script>
     <script src="js/jquery.xcolor.js"></script>
 	<script src="js/helpers.js"></script>
+
+    <script src="js/ext-core.js"></script>
     <script src="js/calendar.js"></script>
 	
-	<script>
+    <script>
 		
         $(document).bind("mobileinit", function(){
           $.extend(  $.mobile , {
@@ -23,29 +25,16 @@
           });
         });
 
-        /*
-            Logging Functions
-         */
-        function log(msg, obj){
-            if(typeof obj === 'undefined' || obj == null){
-                console.log("%s", msg);
-            }else{
-                console.log("%s: %o", msg, obj);
-            }
-        }
-        jQuery.fn.log = function (msg) {
-            log(msg, this);
-            return this;
-        };
-
-
         //Browser On Load Event
 		$(document).ready(function() {
 
+            var local_storage_events = localStorage.getItem("events");
+            var $cal = $('#events');
+
             // When anything in localStorage changes
             $(window).bind('storage', function (e) {
-                log("[Storage Event]");
-                var $cal = $('#events');
+                log("[EVENT] Storage Changed", localStorage);
+                var locale_events = localStorage.getItem("events") || "";
                 var widget_notify_user = localStorage.getItem("widget_notify_user") || false;
 
                 if(widget_notify_user){
@@ -54,6 +43,12 @@
                     localStorage.removeItem("widget_notify_user");
                 }
 
+                //Check if any events changed or where added
+                if(local_storage_events.localeCompare(locale_events) != 0){
+                    log("[NOTICE] Some events have changed.");
+                    local_storage_events = locale_events;
+                    updateContent();
+                }
             });
 
             /*
@@ -61,11 +56,9 @@
                 and displays them.
              */
 			function updateContent(){
-				var $cal = $('#events');
-
-				events = JSON.parse(localStorage.getItem("events"));
+				events = JSON.parse(local_storage_events);
                 events == null ? events = [] : true;
-                log("Current Events from storage: ", events);
+                log("[DEBUG] Events: ", events);
 				
 				var now = new Date();
 				var eventCount = 0, displayEventWithoutAllDayCount = 0, displayEventCount = 0, nextEventIndex = -1;
@@ -78,58 +71,46 @@
 					
 					var displayDayCount = 5, offset = 0;
 					for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
-						
+
+
 						offset = index;
 						var cStart = new Blz.GData.Date().addDays(offset).resetHours(),
                             cEnd = new Date(cStart.date.getFullYear(), cStart.date.getMonth(), cStart.date.getDate(), 23, 59, 59, 0);
 
-                        log("cStart", cStart.date);
-                        log("cEnd", cEnd);
-
 						var header = getHeaderDateString(cStart);
                         if (offset == 0) header += ' - ' + getResourceString('TODAY');
                         else if (offset == 1) header += ' - ' + getResourceString('TOMORROW');
-                        else if (offset == -1) header += ' - ' + getResourceString('YESTERDAY');
 						$list.append($.fn._cal_header(header, 0));
 
-                        if(events.length > 0){
-                            events.sort($.fn.appointmentCompare);
+                        events.sort($.fn.appointmentCompare);
 
-                            for (var i=0, len=events.length; i<len; i++) {
+                        for (var i=0, len=events.length; i<len; i++) {
 
-                                //convert start/end to date object
-                                var event = events[i];
-                                event.start = new Date(event.start);
-                                event.end = new Date(event.end);
+                            //convert start/end to date object
+                            var event = events[i];
+                            event.start = new Date(event.start);
+                            event.end = new Date(event.end);
 
-                                if (event.end<=cStart.date||event.start>=cEnd) continue;
-                                eventCount++;
+                            if (event.end<=cStart.date||event.start>=cEnd) continue;
+                            eventCount++;
 
-                                var location = (event.location && event.location.length > 0) ? event.location : '';
-                                var time = (event.allDay) ? getResourceString('ALL_DAY_EVENT') : getTimeString(event.start);
-                                var color = $.xcolor.lighten(event.color, 3, 25);
-                                var remain = (now < event.start) ? getRemainTimeString(event.start) : '';
-                                var tooltip = [event.title,time,remain,location].join(' ');
+                            var location = (event.location && event.location.length > 0) ? event.location : '';
+                            var time = (event.allDay) ? getResourceString('ALL_DAY_EVENT') : getTimeString(event.start);
+                            var color = $.xcolor.lighten(event.color, 3, 25);
+                            var remain = (now < event.start) ? getRemainTimeString(event.start) : '';
+                            var tooltip = [event.title,time,remain,location].join(' ');
 
-                                var $li = $.fn._cal_event(event.title, location, time, event.link, color);
-                                $list.append($li.attr({title:tooltip}));
-                                displayEventCount++;
-                            }
+                            var $li = $.fn._cal_event(event.title, location, time, event.link, color);
+                            $list.append($li.attr({title:tooltip}));
+                            displayEventCount++;
                         }
+
 					}
 					
 					//$cal.append($list);
 					$list.listview('refresh');
                     update_cal_header_counts($list);
 				}
-				if (cache.loading) {
-					$cal._msg(getResourceString('LOADING_EVENT'),true);
-				} else if (eventCount == 0) {
-					$cal._msg(getResourceString('NOTHING_EVENT'));
-				} else if (displayEventCount == 0) {
-					$cal._msg(getResourceString('NOTHING_DISPLAY_EVENT'));
-				}		
-				
 			}
 
             function update_cal_header_counts($list){
@@ -143,8 +124,8 @@
 			updateContent();
     	});
     </script>
-  </head>
-  <body>
+</head>
+<body>
 	<div id="events" data-role="page" data-theme="a">
         <div data-role="header" data-theme="b">
             <h1>Google Calendar</h1>
@@ -152,7 +133,7 @@
   		<ul class="events_ul" data-role="listview" data-theme="a" data-divider-theme="c">
   		    <li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
 
-             <li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
+            <li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
 			<li data-corners="false" data-shadow="false" class="event" data-icon="false">
 				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
 				<a href="index.html">
@@ -161,15 +142,15 @@
 					<p class="ui-li-desc event_location">Location</p>
 				</a>
 			</li>
-              <li data-corners="false" data-shadow="false" class="event" data-icon="false">
-				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
+            <li data-corners="false" data-shadow="false" class="event" data-icon="false">
+			    <span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
 				<a href="index.html">
 					<h3 class="ui-li-heading">Event Title</h3>
 					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
 					<p class="ui-li-desc event_location">Location</p>
 				</a>
 			</li>
-              <li data-corners="false" data-shadow="false" class="event" data-icon="false">
+            <li data-corners="false" data-shadow="false" class="event" data-icon="false">
 				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
 				<a href="index.html">
 					<h3 class="ui-li-heading">Event Title</h3>
@@ -189,5 +170,5 @@
 
 		</ul>
 	</div>
-  </body>
+</body>
 </html>

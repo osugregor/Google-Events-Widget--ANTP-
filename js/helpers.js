@@ -1,4 +1,19 @@
-/* 
+/*
+ Logging Functions
+ */
+function log(msg, obj){
+    if(typeof obj === 'undefined' || obj == null){
+        console.log("%s", msg);
+    }else{
+        console.log("%s: %o", msg, obj);
+    }
+}
+jQuery.fn.log = function (msg) {
+    log(msg, this);
+    return this;
+};
+
+/*
 	Pretty print of a date 
 */
 function getTimeString(date) {
