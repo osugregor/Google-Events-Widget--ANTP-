@@ -82,7 +82,8 @@
                 widget_notify("No Calendars...");
                 return;
             }
-            var num_days = w.getPref('numDays');num_days = (!isNaN(num_days)) ? num_days : 5;
+            var num_days = w.getPref('numDays');
+            num_days = (!isNaN(num_days)) ? num_days : 5;
 			var offset = w.getPref('offset') || 0;
 			var cStart = new Blz.GData.Date().addDays(offset).resetHours();
 			var events = [], cache = app.getAppointments(cStart); // copy the array to add repeaters
@@ -90,8 +91,6 @@
 				var cal = app.findCalendarById(calid);
 				if (cal && cal.selected) {
 					events = events.concat(cache.items[calid]);
-				} else {
-					//w.print('"'+cal.title['#text']+'" calendar is not selected.');
 				}
 			}
 			

@@ -1,254 +1,101 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Options - Weather</title>
-    <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="jquery.jgrowl.js"></script>
-    <link href="jquery.jgrowl.css" media="screen" rel="stylesheet" type="text/css" />
+<head>
+    <title>Options - Google Events</title>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.gritter.css" />
+    <script type="text/javascript" src="js/jquery.gritter.min.js"></script>
     <style type="text/css">
-      #buttons {
-        text-align: center;
-        position: absolute;
-        top: 15px;
-        left: 22px;
-        width: 70px;
-      }
 
-      body { font:13px/150% Verdana, Tahoma, sans-serif; }
-
-      input, textarea, select {
-        padding: 9px;
-        border: solid 1px #E5E5E5;
-        outline: 0;
-        font: normal 13px/100% Verdana, Tahoma, sans-serif;
-        width: 200px;
-        background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #EEEEEE), to(#FFFFFF));
-        background: -moz-linear-gradient(top, #FFFFFF, #EEEEEE 1px, #FFFFFF 25px);
-        box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
-        -moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
-        -webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
-        }
-      select {
-        width: 220px;
-      }
-
-      textarea {
-        width: 400px;
-        max-width: 400px;
-        height: 150px;
-        line-height: 150%;
+        #buttons {
+            text-align: center;
         }
 
-      input:hover, textarea:hover,
-      input:focus, textarea:focus {
-        border-color: #C9C9C9;
-        -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 8px;
-      }
-      #plus {
-        padding-left: 100px;
-      }
-      form {
-        padding-top: 0px;
-        padding-left: 100px;
-      }
-      .form label {
-        margin-left: 10px;
-        color: #999;
-      }
-      .form label:hover {
-        color: #777;
-      }
+        #settings input, #settings textarea, #settings select {
+            padding: 9px;
+            border: solid 1px #E5E5E5;
+            outline: 0;
+            font: normal 13px/100% Verdana, Tahoma, sans-serif;
+            width: 200px;
+            background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #EEEEEE), to(#FFFFFF));
+            background: -moz-linear-gradient(top, #FFFFFF, #EEEEEE 1px, #FFFFFF 25px);
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
+            -moz-box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
+            -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
+        }
 
-      .submit input {
-        width: auto;
-        padding: 9px 15px;
-        background: #617798;
-        border: 0;
-        font-size: 14px;
-        color: #FFF;
-        -moz-border-radius: 5px;
-        -webkit-border-radius: 5px;
-        cursor: pointer;
-      }
-      hr {
-        height: 0;
-        border: 0;
-        border-bottom: 1px solid rgba(0, 0, 0, .5);
-      }
+        input#days {
+            width: 30px;
+        }
+
+        input:hover, textarea:hover,
+        input:focus, textarea:focus {
+            border-color: #C9C9C9;
+            -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 8px;
+        }
+        #links {
+            float: left;
+            padding: 0 15px;
+        }
+        #settings {
+            padding: 0 20px;
+            float: left;
+        }
+        #settings p {
+            margin-top: 0;
+        }
+        #settings label {
+            margin-left: 10px;
+            color: #999;
+        }
     </style>
 
-  </head>
+    <script>
+        function resetForm(){
+            $("input#days").val(localStorage.getItem('numDays') || 5);
+        }
 
-  <body>
-    <form class="form">
-      <p class="place">
-        <input type="text" name="place" id="place" placeholder="San Francisco, CA" />
-        <label for="place">Location</label>
-      </p>
-      <p class="unit">
-        <select id="unit" name="unit">
-          <option value="F">F</option>
-          <option value="C">C</option>
-        </select>
-        <label for="unit">Weather Unit</label>
-      </p>
-      <p class="style">
-        <select id="style" name="style">
-          <option value="A">Yes</option>
-          <option value="M">No</option>
-        </select>
-        <label for="style">Use Android Style (requires reload of Awesome New Tab Page)</label>
-      </p>
-      <p class="hl">
-        <select id="hl">
-          <option value="en">English</option>
-          <option value="af">Afrikaans</option>
-          <option value="sq">Albanian</option>
-          <option value="sm">Amharic</option>
-          <option value="ar">Arabic</option>
-          <option value="az">Azerbaijani</option>
-          <option value="eu">Basque</option>
-          <option value="be">Belarusian</option>
-          <option value="bn">Bengali</option>
-          <option value="bh">Bihari</option>
-          <option value="bs">Bosnian</option>
-          <option value="bg">Bulgarian</option>
-          <option value="ca">Catalan</option>
-          <option value="zh-CN">Chinese (Simplified)</option>
-          <option value="zh-TW">Chinese (Traditional)</option>
-          <option value="hr">Croatian</option>
-          <option value="cs">Czech</option>
-          <option value="da">Danish</option>
-          <option value="nl">Dutch</option>
-          <option value="eo">Esperanto</option>
-          <option value="et">Estonian</option>
-          <option value="fo">Faroese</option>
-          <option value="fi">Finnish</option>
-          <option value="fr">French</option>
-          <option value="fy">Frisian</option>
-          <option value="gl">Galician</option>
-          <option value="ka">Georgian</option>
-          <option value="de">German</option>
-          <option value="el">Greek</option>
-          <option value="gu">Gujarati</option>
-          <option value="iw">Hebrew</option>
-          <option value="hi">Hindi</option>
-          <option value="hu">Hungarian</option>
-          <option value="is">Icelandic</option>
-          <option value="id">Indonesian</option>
-          <option value="ia">Interlingua</option>
-          <option value="ga">Irish</option>
-          <option value="it">Italian</option>
-          <option value="ja">Japanese</option>
-          <option value="jw">Javanese</option>
-          <option value="kn">Kannada</option>
-          <option value="ko">Korean</option>
-          <option value="la">Latin</option>
-          <option value="lv">Latvian</option>
-          <option value="lt">Lithuanian</option>
-          <option value="mk">Macedonian</option>
-          <option value="ms">Malay</option>
-          <option value="ml">Malayam</option>
-          <option value="mt">Maltese</option>
-          <option value="mr">Marathi</option>
-          <option value="ne">Nepali</option>
-          <option value="no">Norwegian</option>
-          <option value="nn">Norwegian (Nynorsk)</option>
-          <option value="oc">Occitan</option>
-          <option value="fa">Persian</option>
-          <option value="pl">Polish</option>
-          <option value="pt-BR">Portuguese (Brazil)</option>
-          <option value="pt-PT">Portuguese (Portugal)</option>
-          <option value="pa">Punjabi</option>
-          <option value="ro">Romanian</option>
-          <option value="ru">Russian</option>
-          <option value="gd">Scots Gaelic</option>
-          <option value="sr">Serbian</option>
-          <option value="si">Sinhalese</option>
-          <option value="sk">Slovak</option>
-          <option value="sl">Slovenian</option>
-          <option value="es">Spanish</option>
-          <option value="su">Sudanese</option>
-          <option value="sw">Swahili</option>
-          <option value="sv">Swedish</option>
-          <option value="tl">Tagalog</option>
-          <option value="ta">Tamil</option>
-          <option value="te">Telugu</option>
-          <option value="th">Thai</option>
-          <option value="ti">Tigrinya</option>
-          <option value="tr">Turkish</option>
-          <option value="uk">Ukrainian</option>
-          <option value="ur">Urdu</option>
-          <option value="uz">Uzbek</option>
-          <option value="vi">Vietnamese</option>
-          <option value="cy">Welsh</option>
-          <option value="xh">Xhosa</option>
-          <option value="zu">Zulu</option>
-        </select>
-        <label for="hl">Localization (Powered by Google; some locales may not work properly)</label>
-      </p>
+        resetForm();
+        function save() {
+            localStorage.setItem('numDays',$("#days").val());
+            $.gritter.add({
+                title: 'This is a notice!',
+                text: 'This will fade out after a certain amount of time.'
+            });
+            console.log(localStorage);
+        }
+        function go2antp() {
+            window.location = "chrome-extension://mgmiemnjjchgkmgbeljfocdjjnpjnmcg/ntp.html";
+        }
 
-      <p class="hl">
-        <input type="button" onclick="reset()" value="Reset">
+        $(document).ready(function() {
+            resetForm();
+        });
+    </script>
+
+</head>
+
+<body>
+<h1>Google Events for Awesome New Tab Page Options</h1>
+<form id="links" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="ANFB97FRS7ADG">
+    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+<form id="settings" action="#">
+
+    <p class="days">
+        <input type="text" name="days" id="days"/>
+        <label for="days">Number of days to load</label>
+    </p>
+
+    <div>
+        <input type="button" onclick="resetForm()" value="Reset">
         <input id="as" type="button" onclick="save()" value="Apply &amp; Save">
         <input id="antp" type="button" onclick="go2antp()" value="Back to ANTP">
-      </p>
-
-    </form>
-
-    <div id="plus">
-      <g:plus href="https://plus.google.com/101062285048075360930" rel="publisher" width="300" height="131" theme="light"></g:plus>
     </div>
 
-    <div id="buttons">
-      <a class="FlattrButton" style="display:none;" href="https://github.com/michaelhart/Awesome-Weather-Widget"></a>
-      <hr />
-      +1 ANTP
-      <g:plusone size="tall" href="https://chrome.google.com/webstore/detail/mgmiemnjjchgkmgbeljfocdjjnpjnmcg"></g:plusone>
-      <hr />
-      +1 This Widget
-      <g:plusone size="tall" href="https://chrome.google.com/webstore/detail/goeepbfnllchoihkoiecpkkekbpfiboc"></g:plusone>
-    </div>
-
-    <script>
-    (function() {
-        var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
-        s.type = 'text/javascript';
-        s.async = true;
-        s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
-        t.parentNode.insertBefore(s, t);
-    })();
-
-    (function() {
-      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-      po.src = 'https://apis.google.com/js/plusone.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-    })();
-
-    var bp = chrome.extension.getBackgroundPage();
-
-    function reset() {
-      $("#place").val( localStorage.place || "San Francisco, CA" );
-      $("#unit").val(localStorage.unit);
-      $("#hl").val(localStorage.unit);
-      $("#style").val(localStorage.style);
-    }
-    reset();
-    function save() {
-      localStorage.place = $("#place").val();
-      localStorage.unit = $("#unit").val();
-      localStorage.hl = $("#hl").val();
-      localStorage.style = $("#style").val();
-
-      bp.update();
-
-      $.jGrowl("You're awesome.", {header: "Saved!!1!", position: "top-right"});
-    }
-
-    function go2antp() {
-      window.location = "chrome-extension://mgmiemnjjchgkmgbeljfocdjjnpjnmcg/ntp.html";
-    }
-
-    </script>
-  </body>
+</form>
+</body>
 </html>
