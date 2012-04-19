@@ -63,14 +63,17 @@
             }
             if (!app.isLogin()) {
                 log("[WARNING] Not Logged In!");
+                requireLogin(true);
                 if (app.isGoogleApps()) {
                     // required client login, go to option
-                    widget_notify(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]))
+                    widget_alert(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]))
                 }else {
                     // In Google account, extension will work with browser session.
-                    widget_notify(w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]));
+                    widget_alert(w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]));
                 }
                 return;
+            }else{
+                requiresLogin(false);
             }
             if (app.isCalendarListRequesting()) {
                 log("[WARNING] Calendar is already requesting.");
@@ -95,7 +98,7 @@
 			}
 			
             localStorage.setItem("events", JSON.stringify(events));
-            widget_notify("update");
+            widget_update();
         }
 
         var observer = {
@@ -117,9 +120,28 @@
             }
         };
 
+        function widget_alert(msg){
+            log("[WIDGET_ALERT]", msg);
+            localStorage.setItem("widget_alert", true);
+            localStorage.setItem("widget_alert_msg", msg);
+            console.log("Storage", localStorage);
+        }
+
         function widget_notify(msg){
+            log("[WIDGET_NOTIFY]", msg);
             localStorage.setItem("widget_notify", true);
             localStorage.setItem("widget_notify_msg", msg);
+            console.log("Storage", localStorage);
+        }
+
+        function requireLogin(required){
+            localStorage.setItem("require_login", required);
+        }
+
+
+        function widget_update(){
+            log("[WIDGET_UPDATE] Sent");
+            localStorage.setItem("widget_update", true);
         }
 
         //Update every so often

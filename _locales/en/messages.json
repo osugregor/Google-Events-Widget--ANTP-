@@ -3,7 +3,7 @@
       "message": "All Day Event"
    },
    "APP_DESCRIPTION": {
-      "message": "Shows today's shedule in Google Calendar\u2122"
+      "message": "Shows today's schedule in Google Calendar\u2122"
    },
    "APP_TITLE": {
       "message": "Today's Schedule in Google Calendar\u2122"
@@ -75,7 +75,7 @@
       "message": "No Events"
    },
    "NOW_LOGIN": {
-      "message": "Login..."
+      "message": "Logging in, please wait..."
    },
    "OPEN_MENU": {
       "message": "Open"
