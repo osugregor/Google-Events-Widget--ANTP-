@@ -856,6 +856,8 @@ Blz.Google.Calendar = {
 		
 		//Additional google paramters
 		g.singleevents = true;
+        g.orderby = "starttime";
+        g['max-results'] = 100000;
 		
         if (this.gsessionid != "") {
             b += "?gsessionid=" + this.gsessionid

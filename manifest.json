@@ -7,8 +7,9 @@
   "options_page": "options.html",
   "default_locale": "en",
   "icons": {
-    "256": "i256.png",
-    "128": "i128.png"
+    "16": "images/128.png",
+    "48": "images/128.png",
+    "128": "images/128.png"
   },
   "permissions": [ "tabs", "notifications", "http://*.google.com/", "https://*.google.com/" ]
 }

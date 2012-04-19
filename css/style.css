@@ -20,6 +20,15 @@ h1 a {
 	margin-top: -3px;
 }
 
+#loader-box {
+    top: 406px; /* 35px */
+    height: 100%;
+    z-index: 10;
+    display: block;
+    margin-top: 0;
+    border-top: black 1px solid;
+}
+
 .event_color {
 	float: left;
 	width: 5px;
@@ -28,6 +37,18 @@ h1 a {
 	border-right: 1px solid #222;
 	margin-top: -1px;
 	padding: 0;
+}
+
+#settings {
+    background: url('../images/cog.png');
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    right: 5px;
+    top: 8px;
+    left: auto;
+    cursor: pointer;
+    opacity: .4;
 }
 
 

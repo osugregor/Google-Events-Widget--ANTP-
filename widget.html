@@ -15,7 +15,8 @@
     <script src="js/jquery.xcolor.js"></script>
 	<script src="js/helpers.js"></script>
 	<script src="js/jquery.mousewheel.js"></script>
-	
+    <script src="js/jquery.easing.1.3.js"></script>
+
 
     <script src="js/ext-core.js"></script>
     <script src="js/calendar.js"></script>
@@ -34,6 +35,12 @@
             var local_storage_events = localStorage.getItem("events");
             var $cal = $('#events');
 
+            $('.google-header').mouseover(function(){
+                $(this).find('#settings').stop().fadeTo('300', 1);
+            }).mouseout(function(){
+                $(this).find('#settings').stop().fadeTo(1600, .4);
+            });
+
             // When anything in localStorage changes
             $(window).bind('storage', function (e) {
                 log("[EVENT] Storage Changed", localStorage);
@@ -42,6 +49,8 @@
 
                 if(widget_notify){
                     var msg = localStorage.getItem("widget_notify_msg");
+                    log("MESSAGE: ", msg);
+                    alert_user(true, msg);
                     localStorage.removeItem("widget_notify_msg");
                     localStorage.removeItem("widget_notify");
                 }
@@ -66,6 +75,7 @@
 				var now = new Date();
 				var eventCount = 0, displayEventWithoutAllDayCount = 0, displayEventCount = 0, nextEventIndex = -1;
 				if (events.length == 0) {
+
 					return;
 				}
 				//<ul data-role="listview" data-theme="a" data-divider-theme="c">
@@ -128,55 +138,32 @@
                    $(this).find('span.ui-li-count').html(total);
                 });
             }
-			
-			updateContent();
+
+            /* Alerts the user */
+            function alert_user(show, msg){
+                $("#loader-box").stop().animate({top: show ? "35px" : $("body").height()}, 2000, 'easeOutBounce');
+                $("#loader-box").find("h1").html(msg);
+            }
+
+            updateContent();
     	});
     </script>
 </head>
 <body>
-	<div id="events" data-role="page" data-theme="a">
-        <div data-role="header" data-theme="b">
+    <div id="loader-box" class="ui-loader ui-body-a">
+        <span class="ui-icon ui-icon-loading spin"></span>
+        <h1>loading</h1>
+    </div>
+
+	<div id="events" class="ui-mobile-viewport ui-overlay-a" data-role="page" data-theme="a">
+        <div class="google-header" data-role="header" data-theme="b">
             <h1><a href="https://www.google.com/calendar/" target="_top"  data-role="none">Google Calendar</a></h1>
+            <a id="settings" data-role="none" href="options.html" target="_top"><span data-role="none"></span></a>
         </div><!-- /header -->
-  		<ul class="events_ul" data-role="listview" data-theme="a" data-divider-theme="c">
-  		    <li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
 
-            <li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
-			<li data-corners="false" data-shadow="false" class="event" data-icon="false">
-				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
-				<a href="index.html">
-					<h3 class="ui-li-heading">Event Title</h3>
-					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
-					<p class="ui-li-desc event_location">Location</p>
-				</a>
-			</li>
-            <li data-corners="false" data-shadow="false" class="event" data-icon="false">
-			    <span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
-				<a href="index.html">
-					<h3 class="ui-li-heading">Event Title</h3>
-					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
-					<p class="ui-li-desc event_location">Location</p>
-				</a>
-			</li>
-            <li data-corners="false" data-shadow="false" class="event" data-icon="false">
-				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
-				<a href="index.html">
-					<h3 class="ui-li-heading">Event Title</h3>
-					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
-					<p class="ui-li-desc event_location">Location</p>
-				</a>
-			</li>
-  			<li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
-			<li data-corners="false" data-shadow="false" class="event" data-icon="false">
-				<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
-				<a href="index.html">
-					<h3 class="ui-li-heading">Event Title</h3>
-					<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
-					<p class="ui-li-desc event_location">Location</p>
-				</a>									
-			</li>
-
-		</ul>
+        <ul class="events_ul" data-role="listview" data-inline="true" data-theme="a" data-divider-theme="c">
+            <li>No Items</li>
+        </ul>
 	</div>
 </body>
 </html>
