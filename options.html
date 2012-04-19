@@ -51,6 +51,8 @@
     </style>
 
     <script>
+		var bp = chrome.extension.getBackgroundPage();
+	
         function resetForm(){
             $("input#days").val(localStorage.getItem('numDays') || 5);
         }
@@ -59,9 +61,10 @@
         function save() {
             localStorage.setItem('numDays',$("#days").val());
             $.gritter.add({
-                title: 'This is a notice!',
-                text: 'This will fade out after a certain amount of time.'
+                title: 'Google Events Options',
+                text: 'Settings Saved!'
             });
+			bp.update();
             console.log(localStorage);
         }
         function go2antp() {

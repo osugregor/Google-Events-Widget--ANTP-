@@ -37,7 +37,6 @@
             // When anything in localStorage changes
             $(window).bind('storage', function (e) {
                 log("[EVENT] Storage Changed", localStorage);
-				
                 var incoming_events = localStorage.getItem("events") || "";
                 var widget_notify = localStorage.getItem("widget_notify") || false;
 
@@ -75,7 +74,7 @@
 						.attr('data-theme', 'a')
 						.attr('data-divider-theme', 'c');
 				
-				var displayDayCount = 5, offset = 0;
+				var displayDayCount = localStorage.getItem("numDays"), offset = 0;
 				for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
 					offset = index;
 					var cStart = new Blz.GData.Date().addDays(offset).resetHours(),
@@ -94,8 +93,9 @@
 						var event = events[i];
 						event.start = new Date(event.start);
 						event.end = new Date(event.end);
-
-						if (event.end<=cStart.date||event.start>=cEnd) continue;
+						//Check if the event belongs in this day
+						if(event.end<=cStart.date||event.start>=cEnd) continue;
+						if(event.allDay == 0 && event.end < now) continue;
 						eventCount++;
 
 						var location = (event.location && event.location.length > 0) ? event.location : '';

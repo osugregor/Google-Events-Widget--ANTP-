@@ -35,17 +35,13 @@ h1 a {
 ::-webkit-scrollbar {
   background: transparent;
   overflow: visible;
-  width: 3px;
+  width: 5px;
 }
 ::-webkit-scrollbar-thumb {
   background-color: #fff;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.8);
-}
-::-webkit-scrollbar-thumb:horizontal {
-  border-width: 4px 4px;
-  min-width: 100px;
+  background: rgba(255,255,255,0.6);
 }
 ::-webkit-scrollbar-thumb:vertical {
   border-width: 4px 4px;

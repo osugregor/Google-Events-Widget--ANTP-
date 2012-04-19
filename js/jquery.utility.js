@@ -37,15 +37,18 @@ $.fn.extend({
         return li;
     },
     appointmentCompare: function (d, c) {
-        var e = d.start - c.start;
+		var a = new Date(d.start);
+		var b = new Date(c.start);
+		
+        var e = a - b;
         if (e == 0) {
             if (d.title < c.title) {
-                return -1
+                return -1;
             } else {
                 if (d.title > c.title) {
-                    return 1
+                    return 1;
                 } else {
-                    return 0
+                    return 0;
                 }
             }
         }

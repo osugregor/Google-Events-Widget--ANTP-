@@ -853,6 +853,10 @@ Blz.Google.Calendar = {
             g = {}
         }
         var b = e.link;
+		
+		//Additional google paramters
+		g.singleevents = true;
+		
         if (this.gsessionid != "") {
             b += "?gsessionid=" + this.gsessionid
         }
@@ -862,6 +866,9 @@ Blz.Google.Calendar = {
             return false
         }
         var f = this.getAuthHeader();
+		console.log(b);
+		console.log(g);
+		console.log(f);
         Blz.Ajax.get(b, function (m) {
             try {
                 var o = m.response,
