@@ -29,7 +29,7 @@
 	      sender.id,
 	      {
 	        head: "mgmiemnjjchgkmgbeljfocdjjnpjnmcg-pokeback",
-	        body: info,
+	        body: info
 	      }
 	    );
 	  }
@@ -41,11 +41,35 @@
             gcal = Blz.Google.Calendar,
             app = MyGoogleCal.Application;
         window.localStorage.removeItem('events'); //clear events from storage
-        w.initialize(); //sets up widget cookie
         gcal.source = 'shayko-GoogleEventsANTP-1';
         gcal.useGoogleLogin = (w.getPref('useGoogleApps')!='1') ? false : true;
         w.setPref("offset", 0);
         app.initialize();
+
+        $(window).bind('storage', function(){
+            var bg_update = !!(localStorage.getItem("bg_update") == "true");
+            if(bg_update){
+                update(true);
+                localStorage.removeItem("bg_update");
+            }
+        });
+
+        chrome.tabs.onUpdated.addListener(onTabUpdated);
+        function onTabUpdated(tabId, changeInfo) {
+            var url = changeInfo.url;
+            if (!url) return;
+            if ((url.indexOf('//www.google.com/calendar/') != -1) ||
+                    ((url.indexOf('//www.google.com/a/') != -1) && (url.lastIndexOf('/acs') == url.length - 4)) ||
+                    (url.indexOf('//www.google.com/accounts/') != -1))
+            {
+                // The login screen isn't helpful
+                if (url.indexOf('https://www.google.com/accounts/ServiceLogin?') == 0) {
+                    return;
+                }
+                w.print("background.onTabUpdated: loginStatusChanged");
+                update(true);
+            }
+        }
 
         function update(force) {
 
@@ -53,101 +77,104 @@
 
             if (force) {
                 log("[NOTICE] Forced Update!");
-                app.retrieveAllCalendar();
-                return;
+                app.retrieveAllCalendar();return;
             }
+            // Check if the application is logging in
             if (app.isLoginRequesting()) {
                 log("[WARNING] Request Login!");
-                widget_notify( w.getResourceString('NOW_LOGIN'));
+                widget_notify('login_requesting', w.getResourceString('NOW_LOGIN'));
                 return;
-            }
+            }else widget_notify('login_requesting', false);
+            // Check if the client is logged in
             if (!app.isLogin()) {
                 log("[WARNING] Not Logged In!");
-                requireLogin(true);
-                if (app.isGoogleApps()) {
-                    // required client login, go to option
-                    widget_alert(w.getResourceString('SESSION_ERROR_ALERT', [chrome.extension.getURL("options.html")]))
-                }else {
-                    // In Google account, extension will work with browser session.
-                    widget_alert(w.getResourceString('SESSION_ERROR_ALERT', [app.getCalendarUrl()]));
-                }
+                widget_alert('widget_require_login', getResourceString('SESSION_ERROR_ALERT', ["https://www.google.com/calendar/"]));
                 return;
-            }else{
-                requiresLogin(false);
-            }
+            }else  widget_alert('widget_require_login', false);
+            // Check if were currently waiting for calendars
             if (app.isCalendarListRequesting()) {
                 log("[WARNING] Calendar is already requesting.");
-                widget_notify("Updating Calendars...");
+                widget_notify('calendars_requesting', "Updating Calendars...");
                 return;
-            }
-            if (app.gcal.cacheCalendars.length==0){
+            }else widget_notify('calendars_requesting', false);
+            // Check if we have any calendars
+            if (app.gcal.cacheCalendars.length == 0){
                 log("[WARNING] No cached calendars");
-                widget_notify("No Calendars...");
+                widget_notify('no_calendars', "No Calendars...");
                 return;
-            }
-            var num_days = w.getPref('numDays');
-            num_days = (!isNaN(num_days)) ? num_days : 5;
-			var offset = w.getPref('offset') || 0;
-			var cStart = new Blz.GData.Date().addDays(offset).resetHours();
+            }else widget_notify('no_calendars', false);
+
+            //Retrieve the events for all calendars
+			var cStart = new Blz.GData.Date().resetHours();
 			var events = [], cache = app.getAppointments(cStart); // copy the array to add repeaters
-			for (calid in cache.items) {
+            for (calid in cache.items) {
 				var cal = app.findCalendarById(calid);
-				if (cal && cal.selected) {
-					events = events.concat(cache.items[calid]);
-				}
+				if (cal && cal.selected)events = events.concat(cache.items[calid]);
 			}
 			
             localStorage.setItem("events", JSON.stringify(events));
-            widget_update();
         }
 
         var observer = {
+            onMyGoogleCalLoginCompleted: function(a, b){},
+            onMyGoogleCalCalendarLoaded: function(a, b){},
+            onMyGoogleCalEventLoaded: function(a, b){}
+        };
+
+        Blz.Util.extend(observer, {
             onMyGoogleCalLoginCompleted: function(sender, event) {
                 log("[EVENT] Cal Login Complete", event);
-                if (event.success) {
-                    app.retrieveAllCalendar();
-                }
+                if (event.success)app.retrieveAllCalendar();
                 update();
             },
             onMyGoogleCalCalendarLoaded: function(sender, event) {
                 log("[EVENT] Calendar Loaded", event);
-                log("[DEBUG] Cached Calendars", gcal.cacheCalendars);
                 update();
             },
             onMyGoogleCalEventLoaded: function(sender, event) {
                 log("[EVENT] Event Loaded", event);
                 update();
             }
-        };
+        });
 
-        function widget_alert(msg){
-            log("[WIDGET_ALERT]", msg);
-            localStorage.setItem("widget_alert", true);
-            localStorage.setItem("widget_alert_msg", msg);
-            console.log("Storage", localStorage);
+        var alerts = {};
+        function widget_alert(key, msg){
+            alerts = JSON.parse(localStorage.getItem('widget_alert'));
+            //Check if were deleting the alert
+            if(msg == "" || msg === false){
+                delete alerts[key];
+            }else{
+                log("[WIDGET_ALERT]", msg);
+                alerts[key] = msg;
+            }
+            localStorage.setItem("widget_alert", JSON.stringify(alerts));
         }
 
-        function widget_notify(msg){
-            log("[WIDGET_NOTIFY]", msg);
-            localStorage.setItem("widget_notify", true);
-            localStorage.setItem("widget_notify_msg", msg);
-            console.log("Storage", localStorage);
-        }
+        var notifications = {};
+        function widget_notify(key, msg){
+            //Check if were deleting the notification
+            if(msg == "" || msg === false){ delete notifications[key]; return; }
+            if(arguments.length == 1){ msg = key; key = false; }
 
-        function requireLogin(required){
-            localStorage.setItem("require_login", required);
+            log("[WIDGET_NOTIFY] [" + key + "] = '" + msg + "'");
+            if(key === false){
+                notifications.push(msg);
+            }else notifications[key] = msg;
+            localStorage.setItem("widget_notify", JSON.stringify(notifications));
         }
-
 
         function widget_update(){
             log("[WIDGET_UPDATE] Sent");
-            localStorage.setItem("widget_update", true);
+            localStorage.setItem('widget_update', true);
         }
 
         //Update every so often
         app.addObserver(observer);
-        setInterval(function(){update();},60*1000);
+
+        setInterval(function(){update();},w.getPref('update_interval')*60*1000);
         // update for modified events via 5 min
-        setInterval(function(){update(true);},300*1000);
+        setInterval(function(){update(true);},w.getPref('update_interval_force')*60*1000);
+
+        window.update = update; //Store Update as a global variable for external script access
     });
 </script>

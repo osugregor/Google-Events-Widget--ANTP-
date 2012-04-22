@@ -1,15 +1,14 @@
 {
-  "update_url": "http://clients2.google.com/service/update2/crx",
-  "background_page": "background.html",
-  "version": "1.0",
-  "name": "Google Events [ANTP]",
-  "description": "Google event widget for Awesome New Tab Page with multiple themes. [ANTP]",
-  "options_page": "options.html",
-  "default_locale": "en",
-  "icons": {
-    "16": "images/128.png",
-    "48": "images/128.png",
-    "128": "images/128.png"
-  },
-  "permissions": [ "tabs", "notifications", "http://*.google.com/", "https://*.google.com/" ]
+    "name": "Google Events [ANTP]",
+    "version": "1.1.1",
+    "description": "Google event widget for Awesome New Tab Page [ANTP]",
+    "icons": {
+        "16": "images/128.png",
+        "48": "images/128.png",
+        "128": "images/128.png"
+    },
+    "default_locale": "en",
+    "background_page": "background.html",
+    "options_page": "options.html",
+    "permissions": [ "tabs", "http://*.google.com/", "https://*.google.com/", "https://*.google-analytics.com" ]
 }

@@ -2,12 +2,12 @@
 <html>
 <head>
   	<title>Google Events Widget [ANTP]</title>
-	
+
 	<!-- CSS Files -->
     <link rel="stylesheet" href="css/jquery.mobile.theme.css" />
     <link rel="stylesheet" href="css/jquery.mobile.structure-1.0.1.css" />
 	<link rel="stylesheet" href="css/style.css" />
-	
+
 	<!--  JS Files -->
     <script src="js/jquery.js" type="text/javascript"></script>
 	<script src="js/jquery.mobile-1.0.1.min.js"></script>
@@ -17,12 +17,10 @@
 	<script src="js/jquery.mousewheel.js"></script>
     <script src="js/jquery.easing.1.3.js"></script>
 
-
-    <script src="js/ext-core.js"></script>
+    <script src="js/google.track.js"></script>
     <script src="js/calendar.js"></script>
-	
+
     <script>
-		
         $(document).bind("mobileinit", function(){
           $.extend(  $.mobile , {
             ajaxEnabled: false
@@ -32,9 +30,8 @@
         //Browser On Load Event
 		$(document).ready(function() {
 
-            var local_storage_events = localStorage.getItem("events") || "";
-            var alert_shown = false;
-            var $cal = $('#events');
+            var w = Blz.Widget;
+            var local_storage_events = localStorage.getItem("events") || "[]";
 
             $('.google-header').mouseover(function(){
                 $(this).find('#settings').stop().fadeTo('300', 1);
@@ -42,35 +39,28 @@
                 $(this).find('#settings').stop().fadeTo(1600, .4);
             });
 
-            log('OPENING STORAGE', localStorage);
+            log('Initial Storage', localStorage);
 
             // When anything in localStorage changes
-            $(window).bind('storage', local_storage_callback);
-
-            function local_storage_callback(e) {
+            $(window).bind('storage', function () {
                 log("[EVENT] Storage Changed", localStorage);
                 var incoming_events = localStorage.getItem("events") || "";
-                var widget_update = localStorage.getItem("widget_update") || false;
-                var widget_notify = localStorage.getItem("widget_notify") || false;
-                var widget_alert = localStorage.getItem("widget_alert") || false;
-                var require_login = localStorage.getItem("require_login") || false;
+                var widget_update = !!(localStorage.getItem("widget_update") == "true");
+                var widget_notifications = JSON.parse(w.getPref('widget_notify'));
+                var widget_alerts = JSON.parse(w.getPref('widget_alert'));
 
-                if(require_login){
-                    alert_user(true, getResourceString('SESSION_ERROR_ALERT', ["https://www.google.com/calendar/"]));
-                }
-                
-                if(widget_alert){
-                    var msg = localStorage.getItem("widget_alert_msg");
-                    log("MESSAGE: ", msg);
-                    alert_user(true, msg);
-                    localStorage.removeItem("widget_alert_msg");
-                    localStorage.removeItem("widget_alert");
-                }
+                // Alerts, block out the calendar
+                show_alerts(widget_alerts);
 
-                if(widget_notify){
-                    var msg = localStorage.getItem("widget_notify_msg");
-                    log("MESSAGE: ", msg);
-                    localStorage.removeItem("widget_notify_msg");
+                // Notifications are deletable via user
+                if(widget_notifications.length > 0){
+                    for(key in widget_notifications){
+                        if(isNaN(key)){
+                            log("NOTIFICATION: [" + key + "] = '" + widget_notifications[key] + "'");
+                        }else{
+                            log("NOTIFICATION: '" + widget_notifications[key] + "'");
+                        }
+                    }
                     localStorage.removeItem("widget_notify");
                 }
 
@@ -81,21 +71,25 @@
                     local_storage_events = incoming_events;
                     updateContent();
                 }
-            };
+            });
+
+            function updateBG(){
+                log("[NOTICE] SENT BG UPDATE")
+                localStorage.setItem('bg_update', true);
+            }
 
             /*
                 Main Update function. Loads the events from the localstorage
                 and displays them.
              */
 			function updateContent(){
-				events = JSON.parse(local_storage_events) || "";
+				events = JSON.parse(local_storage_events);
                 events == null ? events = [] : true;
                 log("[DEBUG] Updating Content with Events: ", events);
-				
+
 				var now = new Date();
 				var eventCount = 0, displayEventWithoutAllDayCount = 0, displayEventCount = 0, nextEventIndex = -1;
 				if (events.length == 0) {
-                    
 					return;
 				}
 				//<ul data-role="listview" data-theme="a" data-divider-theme="c">
@@ -103,8 +97,8 @@
 						.attr('data-role', 'listview')
 						.attr('data-theme', 'a')
 						.attr('data-divider-theme', 'c');
-				
-				var displayDayCount = localStorage.getItem("numDays"), offset = 0;
+
+				var displayDayCount = localStorage.getItem("numDays") || 5, offset = 0;
 				for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
 					offset = index;
 					var cStart = new Blz.GData.Date().addDays(offset).resetHours(),
@@ -140,11 +134,11 @@
 					}
 
 				}
-					
+
 				$list.listview('refresh');
 				update_cal_header_counts($list);
 
-				$('#events ul').bind('mousewheel', function(e, d) {	
+				$('#events ul').bind('mousewheel', function(e, d) {
 					var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
 					if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
 						e.preventDefault();
@@ -159,25 +153,44 @@
                 });
             }
 
-            /* Alerts the user */
-            function alert_user(show, msg){
-                $("#loader-box").stop().animate({top: show ? "35px" : $("body").height()}, 2000, 'easeOutBounce');
-                if(!alert_shown){
-                    $("#loader-box").html("");
+            /* Alerts the user with the object of given events */
+            function show_alerts(alerts){
+                var key = null;
+                if(Object.keys(alerts).length == 0){
+                    $("#loader-box").stop().animate({top: $("body").height(), opacity: 0}, 500, function(){
+                        $(this).html(""); //Clear it!
+                    });
+                    return;
                 }
-                $("#loader-box").append($("<h1/>").html(msg));
-                alert_shown = show;
+
+                // Ensure the alert container is visible
+                $("#loader-box").stop().animate({top: "35px", opacity: 1}, 2000, 'easeOutBounce');
+
+                // Check if any alerts should be removed
+                $("#loader-box h1").each(function(){
+                    var exists = false;
+                    for(key in alerts)if($(this).hasClass('alert-' + key)){ exists = true; break; }
+                    if(!exists)$(this).fadeOut('slow', function(){ $(this).remove();});
+                });
+
+                // Add the new alerts
+                for(key in alerts){
+                    if($("#loader-box h1.alert-" + key).length == 0)
+                        $("#loader-box").append($("<h1/>").addClass('alert-' + key).html(alerts[key]));
+                }
+
+                // If no alerts are left, hide the box and clear it
+                if($("#loader-box h1").length == 0)
+                    $("#loader-box").stop().animate({top: $("body").height(), opacity: 0}, 500, function(){ $(this).html(""); });
             }
             //Trigger storage to show messages
             $(window).trigger('storage');
-            //updateContent();
+            updateContent();
     	});
     </script>
 </head>
 <body>
-    <ul id="loader-box" class="ui-loader ui-body-a">
-        <span class="ui-icon ui-icon-loading spin"></span>
-    </ul>
+    <ul id="loader-box" class="ui-loader ui-body-a"><!--<span class="ui-icon ui-icon-loading spin"></span>--></ul>
 
 	<div id="events" class="ui-mobile-viewport ui-overlay-a" data-role="page" data-theme="a">
         <div class="google-header" data-role="header" data-theme="b">
@@ -185,9 +198,7 @@
             <a id="settings" data-role="none" href="options.html" target="_top"><span data-role="none"></span></a>
         </div><!-- /header -->
 
-        <ul class="events_ul" data-role="listview" data-inline="true" data-theme="a" data-divider-theme="c">
-            <li>No Items</li>
-        </ul>
+        <ul class="events_ul" data-role="listview" data-inline="true" data-theme="a" data-divider-theme="c"></ul>
 	</div>
 </body>
 </html>

@@ -29,6 +29,9 @@ body {
     border-top: black 1px solid;
 }
 
+#loader-box a { color: #5E87B0;}
+#loader-box a:hover { color: #E47911;}
+
 .event_color {
 	float: left;
 	width: 5px;

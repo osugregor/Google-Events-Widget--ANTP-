@@ -6,34 +6,10 @@ if (typeof (Blz) == "undefined") {
                    Utilities
  *************************************************/
 Blz.Util = {
-    toArray: function (d) {
-        if (!d) {
-            return []
-        }
-        if (d.toArray) {
-            return d.toArray()
-        }
-        var b = [];
-        for (var a = 0, c = d.length; a < c; a++) {
-            b.push(d[a])
-        }
-        return b
-    },
     extend: function (a, c) {
         for (var b in c) {
             a[b] = c[b]
         }
-        return a
-    },
-    removeInjectionsForWeb: function (a) {
-        if (!a) {
-            return
-        }
-        a = String(a);
-        a = a.replace(/[<>\"\'\\\n\r]/g, function (b) {
-            b = escape(b);
-            return b
-        });
         return a
     }
 };
@@ -364,44 +340,6 @@ Blz.XML.SimpleElement.prototype = {
     },
     escape: function (a) {
         return String(a).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-    }
-};
-
-/************************************************
- Version
- *************************************************/
-Blz.Version = function (b, d, c, a) {
-    this.major = (b != null) ? b : 0;
-    this.minor = (d != null) ? d : 0;
-    this.revision = (c != null) ? c : 0;
-    this.buildNumber = (a != null) ? a : 0
-};
-Blz.Version.prototype = {
-    parse: function (b) {
-        var a = b.split(".");
-        switch (a.length) {
-            case 4:
-                this.buildNumber = a[3];
-            case 3:
-                this.revision = a[2];
-            case 2:
-                this.minor = a[1];
-            case 1:
-                this.major = a[0];
-                break
-        }
-    },
-    toString: function () {
-        return [this.major, this.minor, this.revision, this.buildNumber].join(".")
-    },
-    compare: function (a) {
-        if (this.major == a.major && this.minor == a.minor && this.revision == a.revision && this.buildNumber == a.buildNumber) {
-            return 0
-        }
-        if ((this.major < a.major) || (this.major == a.major && this.minor < a.minor) || (this.major == a.major && this.minor == a.minor && this.revision < a.revision) || (this.major == a.major && this.minor == a.minor && this.revision == a.revision && this.buildNumber < a.buildNumber)) {
-            return -1
-        }
-        return 1
     }
 };
 
@@ -868,9 +806,6 @@ Blz.Google.Calendar = {
             return false
         }
         var f = this.getAuthHeader();
-		console.log(b);
-		console.log(g);
-		console.log(f);
         Blz.Ajax.get(b, function (m) {
             try {
                 var o = m.response,
@@ -1027,183 +962,34 @@ Blz.Google.Calendar = {
 Blz.Util.extend(Blz.Google.Calendar, Blz.GData);
 
 /************************************************
-					Cookie
-*************************************************/
-Blz.Cookie = {
-    userDataForIE: false,
-    isIE: Ext.isIE,
-    initialize: function (a) {
-        this.cookieShelfLife = 365;
-        this.userDataForIE = a;
-        if (Ext.isIE && this.userDataForIE) {
-            this.IE_CACHE_NAME = "storage";
-            if ($(this.IE_CACHE_NAME) == null) {
-                var b = document.createElement("DIV");
-                b.id = this.IE_CACHE_NAME;
-                document.body.appendChild(b)
-            }
-            this.store = $(this.IE_CACHE_NAME);
-            this.store.style.behavior = "url('#default#userData')"
-        }
-    },
-    getCookie: function (d) {
-        var a = null;
-        if (Ext.isIE && this.userDataForIE) {
-            this.store.load(this.IE_CACHE_NAME);
-            a = this.store.getAttribute(d)
-        } else {
-            for (var c = 0; c < document.cookie.split("; ").length; c++) {
-                var b = document.cookie.split("; ")[c].split("=");
-                if (b[0] == d && b[1] != null) {
-                    a = b[1];
-                    break
-                }
-            }
-        }
-        if (Ext.isOpera.isBrowserOpera && a != null) {
-            a = a.replace(/%22/g, '"')
-        }
-        return a
-    },
-    setCookie: function (f, d, c) {
-        if (Ext.isIE && this.userDataForIE) {
-            this.store.setAttribute(f, d);
-            this.store.save(this.IE_CACHE_NAME)
-        } else {
-            if (Ext.isOpera) {
-                d = d.replace(/"/g, "%22")
-            }
-            var b = new Date();
-            b.setTime(b.getTime() + (this.cookieShelfLife * 24 * 60 * 60 * 1000));
-            var a = "; expires=" + b.toGMTString();
-            var e = (c) ? "; domain=" + c : "";
-            document.cookie = f + "=" + d + e + a + "; path=/"
-        }
-    },
-    clearCookie: function (a) {
-        if (Ext.isIE && this.userDataForIE) {
-            this.store.load(this.IE_CACHE_NAME);
-            this.store.removeAttribute(a);
-            this.store.save(this.IE_CACHE_NAME)
-        } else {
-            document.cookie = a + "=;expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/"
-        }
-    }
-};
-
-/************************************************
 					Widget
 *************************************************/
 Blz.Widget = {
-    Engines: {
-        Browser: "browser",
-        Yahoo: "yahoo",
-        iGoogle: "igoogle",
-        GoogleDesktop: "googledesktop",
-        VistaSidebar: "sidebar",
-        Unknown: "unknown"
+    defaults: {
+        days_to_show: 5,
+        offset: 0,
+        update_interval: 1, //Minutes
+        update_interval_force: 3, //Minutes,
+        widget_alert: "{}",
+        widget_notify: "{}"
     },
-    Platforms: {
-        Windows: "windows",
-        MacOSX: "macosx",
-        Linux: "linux",
-        Unknown: "unknown"
-    },
-    engine: "unknown",
-    getPlatform: function () { return this.Platforms.Unknown; },
-    getLocale: function () { return "en"; },
-    toPlatformPath: function (a) {
-        if (!a)return;
-        if (this.getPlatform() == this.Platforms.Windows) {
-            a = a.replace("/", "\\")
-        }
-        return a
-    },
-    alert: function () {},
-    assert: function (a) {},
     debug: function (a) {},
     print: function (a) {},
-    capabilities: {
-        com: false,
-        appleScript: false,
-        dummy: false
-    },
-    connectComObject: function (a, b) {},
-    createComObject: function (a) { return null; },
-    disconnectComObject: function (a) {},
-    appleScript: function (a) {},
-    createXmlHttpRequest: function () {
-        var c = null;
-        try {
-            c = new XMLHttpRequest()
-        } catch (f) {
-            if (window.ActiveXObject) {
-                var b = ["MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP", "Microsoft.XMLHTTP"];
-                for (var d = 0, a = b.length; d < a; d++) {
-                    try {
-                        c = new ActiveXObject(b[d]);
-                        break
-                    } catch (f) {}
-                }
-            }
-        }
-        return c
-    },
-    name: "",
-    version: "",
-    author: "",
-    company: "",
-    close: function () {},
-    focus: function () {},
-    reload: function () {},
-    showPref: function () {},
     setPref: function (a, b) {},
     getPref: function (a) { return "bb"; },
-    getResourceString: function (a) { return ""; },
-    getMenuSeparatorTitle: function () { return ""; }
+    getResourceString: function (a) { return ""; }
 };
 Blz.Util.extend(Blz.Widget, {
-    initialize: function () {
-        this.isComSupported = (typeof (ActiveXObject) != "undefined") ? true : false;
-        this.cookie = Blz.Cookie;
-        this.cookie.initialize()
-    },
-    engine: Blz.Widget.Engines.Browser,
-    getPlatform: function () {
-        if (Ext.isWindows) {
-            return Blz.Widget.Platforms.Windows
-        } else {
-            if (Ext.isMac) {
-                return Blz.Widget.Platforms.MacOSX
-            } else {
-                if (Ext.isLinux) {
-                    return Blz.Widget.Platforms.Linux
-                }
-            }
-        }
-        return Blz.Widget.Platforms.Unknown
-    },
     debug: function (a) {
         console.log("[DEBUG] %o", a);
     },
     print: function (a) {
         console.log("(BLZ) " + a)
     },
-    connectComObject: function (a, b) {},
-    createComObject: function (a) {
-        return new ActiveXObject(a)
-    },
-    disconnectComObject: function (a) {},
-    name: "",
-    version: "",
-    author: "",
-    company: "",
     setPref: function (a, b) {
         try {
             if (window.localStorage) {
                 localStorage[a] = b
-            } else {
-                this.cookie.setCookie(a, b)
             }
         } catch (c) {}
     },
@@ -1212,10 +998,9 @@ Blz.Util.extend(Blz.Widget, {
         try {
             if (window.localStorage) {
                 b = localStorage[a]
-            } else {
-                b = this.cookie.getCookie(a)
             }
         } catch (c) {}
+        if(b === undefined)b = Blz.Widget.defaults[a];
         return b
     },
     getResourceString: function (b, a) {
@@ -1245,8 +1030,6 @@ MyGoogleCal.Application = {
                 a.print("MyGoogleCal.Application: Google Login mode");
                 var b = a.getPref("mail");
                 var c = a.getPref("password");
-                console.log(b)
-                console.log(c)
                 this.gcal.login(b, c)
             } else {
                 a.print("MyGoogleCal.Application: browser session mode");
