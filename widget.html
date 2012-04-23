@@ -32,11 +32,15 @@
 
             var w = Blz.Widget;
             var local_storage_events = localStorage.getItem("events") || "[]";
+            var events_ul = $('#events_ul');
+
 
             $('.google-header').mouseover(function(){
                 $(this).find('#settings').stop().fadeTo('300', 1);
+                $(this).find('#refresh').stop().fadeTo('300', 1);
             }).mouseout(function(){
-                $(this).find('#settings').stop().fadeTo(1600, .4);
+                $(this).find('#settings').stop().fadeTo(1200, .3);
+                $(this).find('#refresh').stop().fadeTo(1200, .3);
             });
 
             log('Initial Storage', localStorage);
@@ -50,7 +54,7 @@
                 var widget_alerts = JSON.parse(w.getPref('widget_alert'));
 
                 // Alerts, block out the calendar
-                show_alerts(widget_alerts);
+                refresh_alerts(widget_alerts);
 
                 // Notifications are deletable via user
                 if(widget_notifications.length > 0){
@@ -74,9 +78,13 @@
             });
 
             function updateBG(){
-                log("[NOTICE] SENT BG UPDATE")
+                log("[NOTICE] SENT BG UPDATE");
                 localStorage.setItem('bg_update', true);
             }
+
+            $('#refresh').click(function(){
+                updateBG();
+            });
 
             /*
                 Main Update function. Loads the events from the localstorage
@@ -88,17 +96,17 @@
                 log("[DEBUG] Updating Content with Events: ", events);
 
 				var now = new Date();
-				var eventCount = 0, displayEventWithoutAllDayCount = 0, displayEventCount = 0, nextEventIndex = -1;
+				var eventCount = 0, displayEventCount = 0;
 				if (events.length == 0) {
 					return;
 				}
 				//<ul data-role="listview" data-theme="a" data-divider-theme="c">
-				var $list = $('.events_ul').empty().addClass('event_list')
+				var $list = events_ul.empty().addClass('event_list')
 						.attr('data-role', 'listview')
 						.attr('data-theme', 'a')
 						.attr('data-divider-theme', 'c');
 
-				var displayDayCount = localStorage.getItem("numDays") || 5, offset = 0;
+				var displayDayCount = w.getPref('days_to_show'), offset = 0;
 				for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
 					offset = index;
 					var cStart = new Blz.GData.Date().addDays(offset).resetHours(),
@@ -119,7 +127,7 @@
 						event.end = new Date(event.end);
 						//Check if the event belongs in this day
 						if(event.end<=cStart.date||event.start>=cEnd) continue;
-						if(event.allDay == 0 && event.end < now) continue;
+
 						eventCount++;
 
 						var location = (event.location && event.location.length > 0) ? event.location : '';
@@ -129,6 +137,7 @@
 						var tooltip = [event.title,time,remain,location].join(' ');
 
 						var $li = $.fn._cal_event(event.title, location, time, event.link, color);
+                        if(event.allDay == 0 && event.end < now) $li.css('opacity', .4);
 						$list.append($li.attr({title:tooltip}));
 						displayEventCount++;
 					}
@@ -138,7 +147,7 @@
 				$list.listview('refresh');
 				update_cal_header_counts($list);
 
-				$('#events ul').bind('mousewheel', function(e, d) {
+				events_ul.bind('mousewheel', function(e, d) {
 					var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
 					if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
 						e.preventDefault();
@@ -153,8 +162,15 @@
                 });
             }
 
+            function notify(name, msg){
+                if(arguments.length == 1){ msg = name; name = ""; }
+                var li = $('<li/>').addClass('notification').addClass(name).attr('data-corners','false').attr('data-shadow','false').attr('data-icon','alert').attr('data-theme','e');
+                events_ul.prepend(li.html(msg));
+            }
+
+
             /* Alerts the user with the object of given events */
-            function show_alerts(alerts){
+            function refresh_alerts(alerts){
                 var key = null;
                 if(Object.keys(alerts).length == 0){
                     $("#loader-box").stop().animate({top: $("body").height(), opacity: 0}, 500, function(){
@@ -196,9 +212,10 @@
         <div class="google-header" data-role="header" data-theme="b">
             <h1><a href="https://www.google.com/calendar/" target="_top"  data-role="none">Google Calendar</a></h1>
             <a id="settings" data-role="none" href="options.html" target="_top"><span data-role="none"></span></a>
+            <span id="refresh" data-role="none"></span>
         </div><!-- /header -->
 
-        <ul class="events_ul" data-role="listview" data-inline="true" data-theme="a" data-divider-theme="c"></ul>
+        <ul id="events_ul" data-role="listview" data-inline="true" data-theme="a" data-divider-theme="c"></ul>
 	</div>
 </body>
 </html>
