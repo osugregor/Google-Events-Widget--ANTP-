@@ -112,7 +112,8 @@
 				if (cal && cal.selected)events = events.concat(cache.items[calid]);
 			}
 			
-            localStorage.setItem("events", JSON.stringify(events));
+            localStorage["events"] = JSON.stringify(events);
+            widget_notify("bg_updating", false);
         }
 
         var observer = {
@@ -147,26 +148,37 @@
                 log("[WIDGET_ALERT]", msg);
                 alerts[key] = msg;
             }
-            localStorage.setItem("widget_alert", JSON.stringify(alerts));
+            localStorage["widget_alert"] = JSON.stringify(alerts);
         }
 
         var notifications = {};
+        notifications.base = [];
         function widget_notify(key, msg){
+            notifications = JSON.parse(localStorage.getItem('widget_notify'));
+            if (typeof (notifications.base) == "undefined") notifications.base = [];
             //Check if were deleting the notification
-            if(msg == "" || msg === false){ delete notifications[key]; return; }
             if(arguments.length == 1){ msg = key; key = false; }
+            if(msg === false){ msg = ""; }
 
             log("[WIDGET_NOTIFY] [" + key + "] = '" + msg + "'");
             if(key === false){
-                notifications.push(msg);
+                if(jQuery.inArray(msg, notifications.base) < 0 )notifications.base.push(msg);
             }else notifications[key] = msg;
-            localStorage.setItem("widget_notify", JSON.stringify(notifications));
+            localStorage["widget_notify"] = JSON.stringify(notifications);
         }
 
         function widget_update(){
             log("[WIDGET_UPDATE] Sent");
-            localStorage.setItem('widget_update', true);
+            localStorage['widget_update'] = true;
         }
+
+        //Clear the notifications and alerts
+        localStorage.removeItem("widget_notify");
+        localStorage.removeItem("widget_alert");
+        localStorage["widget_notify"] = JSON.stringify(notifications);
+        localStorage["widget_alert"] = JSON.stringify(alerts);
+
+        console.log(localStorage);
 
         //Update every so often
         app.addObserver(observer);

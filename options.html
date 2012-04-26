@@ -4,6 +4,7 @@
     <title>Options - Google Events</title>
     <script src="js/google.track.js"></script>
     <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/calendar.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/jquery.gritter.css" />
     <script type="text/javascript" src="js/jquery.gritter.min.js"></script>
@@ -26,14 +27,14 @@
             -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
         }
 
-        input#days {
-            width: 30px;
-        }
+        #settings .number input { width: 36px; }
+
+        #settings .alpha input { width: 30px; }
 
         input:hover, textarea:hover,
         input:focus, textarea:focus {
             border-color: #C9C9C9;
-            -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 8px;
+            -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0 0 8px;
         }
         #links {
             float: left;
@@ -43,31 +44,49 @@
             padding: 0 20px;
             float: left;
         }
-        #settings p {
-            margin-top: 0;
-        }
+        #settings p { margin-top: 0; }
         #settings label {
             margin-left: 10px;
             color: #999;
         }
+
+        h1 { padding-left: 15px; text-shadow: 1px 1px #BABABA; }
+
+        hr{ margin-bottom: 25px; }
+
+        fieldset {
+            padding: 0;
+            margin-bottom: 30px;
+            border: 0;
+        }
+
+        fieldset legend {
+            font-size: 1.2em;
+            font-family: Rockwell, Helvetica, Arial, serif;
+            padding-bottom: 5px;
+        }
+
     </style>
 
     <script>
+        var w = Blz.Widget;
 		var bp = chrome.extension.getBackgroundPage();
 	
         function resetForm(){
-            $("input#days").val(localStorage.getItem('numDays') || 5);
+            $("input#days_to_show").val(w.getPref('days_to_show'));
+            $("input#event_old_fade_amount").val(w.getPref('event_old_fade_amount'));
         }
 
-        resetForm();
         function save() {
-            localStorage.setItem('numDays',$("#days").val());
+            w.setPref('days_to_show', $("#days_to_show").val());
+            w.setPref('event_old_fade_amount', $("#event_old_fade_amount").val());
             $.gritter.add({
                 title: 'Google Events Options',
                 text: 'Settings Saved!'
             });
 			bp.update(true);
         }
+
         function go2antp() {
             window.location = "chrome-extension://mgmiemnjjchgkmgbeljfocdjjnpjnmcg/ntp.html";
         }
@@ -81,6 +100,7 @@
 
 <body>
 <h1>Google Events for Awesome New Tab Page Options</h1>
+<hr />
 <form id="links" action="https://www.paypal.com/cgi-bin/webscr" method="post">
     <input type="hidden" name="cmd" value="_s-xclick">
     <input type="hidden" name="hosted_button_id" value="ANFB97FRS7ADG">
@@ -89,10 +109,25 @@
 </form>
 <form id="settings" action="#">
 
-    <p class="days">
-        <input type="text" name="days" id="days"/>
-        <label for="days">Number of days to load</label>
-    </p>
+    <fieldset>
+        <legend>Calendar Settings</legend>
+
+        <p class="days_to_show number">
+            <input type="text" name="days_to_show" id="days_to_show"/>
+            <label for="days_to_show">Number of days to load</label>
+        </p>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>Theme Settings</legend>
+
+        <p class="event_old_fade_amount alpha">
+            <input type="text" name="event_old_fade_amount" id="event_old_fade_amount"/>
+            <label for="event_old_fade_amount">The fade amount on old events</label>
+        </p>
+
+    </fieldset>
 
     <div>
         <input type="button" onclick="resetForm()" value="Reset">

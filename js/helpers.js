@@ -2,6 +2,7 @@
  Logging Functions
  */
 function log(msg, obj){
+    return;
     if(typeof obj === 'undefined' || obj == null){
         console.log("%s", msg);
     }else{
@@ -9,7 +10,7 @@ function log(msg, obj){
     }
 }
 jQuery.fn.log = function (msg) {
-    log(msg, this);
+    //log(msg, this);
     return this;
 };
 

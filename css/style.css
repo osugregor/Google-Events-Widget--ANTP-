@@ -8,7 +8,7 @@ body {
 	color: inherit;
 }
 
-.events_ul {
+#events_ul {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	height: 371px;
@@ -42,6 +42,10 @@ body {
 	padding: 0;
 }
 
+#events_ul .notification {
+    padding: 4px;
+}
+
 #settings {
     background: url('../images/cog.png');
     width: 16px;
@@ -51,7 +55,19 @@ body {
     top: 9px;
     left: 7px;
     cursor: pointer;
-    opacity: .4;
+    opacity: .2;
+}
+
+#refresh {
+    background: url('../images/arrow_refresh.png');
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    /* right: 5px; */
+    top: 8px;
+    right: 7px;
+    cursor: pointer;
+    opacity: .2;
 }
 
 

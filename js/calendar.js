@@ -971,7 +971,8 @@ Blz.Widget = {
         update_interval: 1, //Minutes
         update_interval_force: 3, //Minutes,
         widget_alert: "{}",
-        widget_notify: "{}"
+        widget_notify: "{}",
+        event_old_fade_amount: .4
     },
     debug: function (a) {},
     print: function (a) {},
@@ -981,10 +982,10 @@ Blz.Widget = {
 };
 Blz.Util.extend(Blz.Widget, {
     debug: function (a) {
-        console.log("[DEBUG] %o", a);
+        //console.log("[DEBUG] %o", a);
     },
     print: function (a) {
-        console.log("(BLZ) " + a)
+        //console.log("(BLZ) " + a)
     },
     setPref: function (a, b) {
         try {
@@ -1171,7 +1172,7 @@ MyGoogleCal.Application = {
                     a.items = {};
                     a.loading = true;
                     a.loadingCount = 0;
-					var num_days = n.getPref('numDays');
+					var num_days = n.getPref('days_to_show');
                     num_days = (!isNaN(num_days)) ? num_days : 5;
                     var f = d.date;
                     var c = new Date(f.getFullYear(), f.getMonth(), f.getDate(), 0, 0, 0, 0);

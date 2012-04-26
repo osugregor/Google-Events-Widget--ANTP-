@@ -32,15 +32,15 @@
 
             var w = Blz.Widget;
             var local_storage_events = localStorage.getItem("events") || "[]";
-            var events_ul = $('#events_ul');
+            var $list = $('#events_ul');
 
 
             $('.google-header').mouseover(function(){
                 $(this).find('#settings').stop().fadeTo('300', 1);
                 $(this).find('#refresh').stop().fadeTo('300', 1);
             }).mouseout(function(){
-                $(this).find('#settings').stop().fadeTo(1200, .3);
-                $(this).find('#refresh').stop().fadeTo(1200, .3);
+                $(this).find('#settings').stop().fadeTo(1200, .2);
+                $(this).find('#refresh').stop().fadeTo(1200, .2);
             });
 
             log('Initial Storage', localStorage);
@@ -57,16 +57,18 @@
                 refresh_alerts(widget_alerts);
 
                 // Notifications are deletable via user
-                if(widget_notifications.length > 0){
-                    for(key in widget_notifications){
-                        if(isNaN(key)){
-                            log("NOTIFICATION: [" + key + "] = '" + widget_notifications[key] + "'");
-                        }else{
-                            log("NOTIFICATION: '" + widget_notifications[key] + "'");
-                        }
+                for(key in widget_notifications){
+                    if(key == "base"){
+                        log("NOTIFICATION: '" + widget_notifications[key] + "'");
+                        for(base_key in widget_notifications.base)
+                            notify(widget_notifications.base[base_key]);
+                        delete widget_notifications.base;
+                    }else{
+                        log("NOTIFICATION: [" + key + "] = '" + widget_notifications[key] + "'");
+                        notify(key, widget_notifications[key]);
                     }
-                    localStorage.removeItem("widget_notify");
                 }
+                localStorage['widget_notify'] = JSON.stringify(widget_notifications);
 
                 //Check if any events changed or where added
                 if(widget_update || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0)){
@@ -79,10 +81,11 @@
 
             function updateBG(){
                 log("[NOTICE] SENT BG UPDATE");
-                localStorage.setItem('bg_update', true);
+                localStorage['bg_update'] = true;
             }
 
             $('#refresh').click(function(){
+                notify("bg_updating", "<center>Refreshing...</center>");
                 updateBG();
             });
 
@@ -100,12 +103,9 @@
 				if (events.length == 0) {
 					return;
 				}
-				//<ul data-role="listview" data-theme="a" data-divider-theme="c">
-				var $list = events_ul.empty().addClass('event_list')
-						.attr('data-role', 'listview')
-						.attr('data-theme', 'a')
-						.attr('data-divider-theme', 'c');
 
+				//<ul data-role="listview" data-theme="a" data-divider-theme="c">
+                $list.children(":not(.notification)").remove();
 				var displayDayCount = w.getPref('days_to_show'), offset = 0;
 				for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
 					offset = index;
@@ -137,7 +137,7 @@
 						var tooltip = [event.title,time,remain,location].join(' ');
 
 						var $li = $.fn._cal_event(event.title, location, time, event.link, color);
-                        if(event.allDay == 0 && event.end < now) $li.css('opacity', .4);
+                        if(event.allDay == 0 && event.end < now) $li.css('opacity', w.getPref('event_old_fade_amount'));
 						$list.append($li.attr({title:tooltip}));
 						displayEventCount++;
 					}
@@ -147,7 +147,7 @@
 				$list.listview('refresh');
 				update_cal_header_counts($list);
 
-				events_ul.bind('mousewheel', function(e, d) {
+                $list.bind('mousewheel', function(e, d) {
 					var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
 					if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
 						e.preventDefault();
@@ -164,10 +164,14 @@
 
             function notify(name, msg){
                 if(arguments.length == 1){ msg = name; name = ""; }
-                var li = $('<li/>').addClass('notification').addClass(name).attr('data-corners','false').attr('data-shadow','false').attr('data-icon','alert').attr('data-theme','e');
-                events_ul.prepend(li.html(msg));
+                if(msg == "" || msg === false){
+                    $list.find('.notification-' + name).slideUp(function(){ $(this).remove(); })
+                }else{
+                    if(name != "" && $list.find('.notification-' + name).length > 0)return;
+                    $list.prepend($('<li/>').html(msg).addClass('notification').addClass('notification-' + name).css('cursor', 'notallowed').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','alert').attr('data-theme','e').click(function(){ $(this).slideUp(function(){ $(this).remove();})}));
+                }
+                $list.listview('refresh'); // Refresh mobile
             }
-
 
             /* Alerts the user with the object of given events */
             function refresh_alerts(alerts){
