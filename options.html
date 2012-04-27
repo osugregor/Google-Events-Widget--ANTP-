@@ -8,62 +8,101 @@
 
     <link rel="stylesheet" type="text/css" href="css/jquery.gritter.css" />
     <script type="text/javascript" src="js/jquery.gritter.min.js"></script>
+	
+	<link href='css/zocial.css' rel='stylesheet' type='text/css'>
+	<link href='css/formalize.css' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <style type="text/css">
-
-        #buttons {
-            text-align: center;
-        }
-
-        #settings input, #settings textarea, #settings select {
-            padding: 9px;
-            border: solid 1px #E5E5E5;
-            outline: 0;
-            font: normal 13px/100% Verdana, Tahoma, sans-serif;
-            width: 200px;
-            background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #EEEEEE), to(#FFFFFF));
-            background: -moz-linear-gradient(top, #FFFFFF, #EEEEEE 1px, #FFFFFF 25px);
-            box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
-            -moz-box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
-            -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
-        }
-
-        #settings .number input { width: 36px; }
-
-        #settings .alpha input { width: 30px; }
-
-        input:hover, textarea:hover,
-        input:focus, textarea:focus {
-            border-color: #C9C9C9;
-            -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0 0 8px;
-        }
-        #links {
-            float: left;
-            padding: 0 15px;
-        }
-        #settings {
-            padding: 0 20px;
-            float: left;
-        }
-        #settings p { margin-top: 0; }
+		body {
+			margin: 0;
+			font-size: 12px;
+			font-family: 'Open Sans', sans-serif;
+		}
+		
+		@font-face {
+		  font-family: "Zocial";
+		  src: url('/fonts/zocial/zocial-regular-webfont.eot');
+		  /* src: url('/fonts/zocial/zocial-regular-webfont.eot?iefix') format('eot'), url('/fonts/zocial/zocial-regular-webfont.woff') format('woff'), url('/fonts/zocial/zocial-regular-webfont.ttf') format('truetype'), url('/fonts/zocial/zocial-regular-webfont.svg') format('svg');*/
+		}
+	
+		h1 {
+			margin: 18px 0 13px;
+			color: #5C6166;
+			font-size: 1.5em;
+			font-weight: normal;			
+			-webkit-user-select: none;
+		}
+		
+		section h1 {
+			border-bottom: 1px solid #F7F7F7;
+		}
+		
+		section, header {
+			display: inline-block;
+			vertical-align: top;
+		}
+		
+		header {
+			padding: 0 30px 10px 4px;
+			margin: 0 0 0 20px;
+		}
+		
+		header h1 {
+			padding-left: 20px;
+			background: url('images/16.png');
+			background-position: center left;
+			background-repeat: no-repeat;
+		}
+		
+		header .github {
+			font-size: 1.2em;
+		}
+		
+		nav {
+			list-style: none;
+		}
+		
+		header nav li {
+			color: #999;
+			margin: 5px 0;
+			cursor: pointer;			
+			text-transform: uppercase;
+		}
+		
+		header nav li.selected {
+			color: #464E5A;
+		}
+		
+		.link {
+			margin-top: 5px;
+			margin-bottom: 5px;
+			text-align: center;
+		}
+		
+		section {
+			display: none;
+		}
+		
+		/* Sizing for generic form elemnts */
+        .number input { width: 36px; }
+        .alpha input { width: 30px; }
+		
         #settings label {
             margin-left: 10px;
             color: #999;
         }
-
-        h1 { padding-left: 15px; text-shadow: 1px 1px #BABABA; }
-
-        hr{ margin-bottom: 25px; }
-
+		
         fieldset {
             padding: 0;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             border: 0;
         }
 
         fieldset legend {
+			color: #7A7A7A;
             font-size: 1.2em;
+			padding: 0 0 5px 0;
             font-family: Rockwell, Helvetica, Arial, serif;
-            padding-bottom: 5px;
         }
 
     </style>
@@ -99,42 +138,64 @@
 </head>
 
 <body>
-<h1>Google Events for Awesome New Tab Page Options</h1>
-<hr />
-<form id="links" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-    <input type="hidden" name="cmd" value="_s-xclick">
-    <input type="hidden" name="hosted_button_id" value="ANFB97FRS7ADG">
-    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-<form id="settings" action="#">
+	<header>
+		<h1>Events</h1>
+		<nav>
+			<li>About</li>
+			<li>Settings</li>
+			<li>Update</li>
+		</nav>
+		<aside id="links">
+			<button class="zocial link github">
+				<span>Fork Me</span>
+			</button>
+			<form class="link" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+				<input type="hidden" name="cmd" value="_s-xclick">
+				<input type="hidden" name="hosted_button_id" value="ANFB97FRS7ADG">
+				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+				<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+			</form>
+		</aside>
+	</header>
+	
+	<section id="about">
+		<h1>About</h1>
+		
+	</section>
+	
+	<section id="settings" style="display: inline-block;">
+		<h1>Settings</h1>
+		<fieldset>
+			<legend>Calendar Settings</legend>
 
-    <fieldset>
-        <legend>Calendar Settings</legend>
+			<div class="days_to_show number">
+				<input type="text" name="days_to_show" id="days_to_show"/>
+				<label for="days_to_show">Number of days to load</label>
+			</div>
 
-        <p class="days_to_show number">
-            <input type="text" name="days_to_show" id="days_to_show"/>
-            <label for="days_to_show">Number of days to load</label>
-        </p>
+		</fieldset>
 
-    </fieldset>
+		<fieldset>
+			<legend>Theme Settings</legend>
 
-    <fieldset>
-        <legend>Theme Settings</legend>
+			<div class="event_old_fade_amount alpha">
+				<input type="text" name="event_old_fade_amount" id="event_old_fade_amount"/>
+				<label for="event_old_fade_amount">The fade amount on old events</label>
+			</div>
 
-        <p class="event_old_fade_amount alpha">
-            <input type="text" name="event_old_fade_amount" id="event_old_fade_amount"/>
-            <label for="event_old_fade_amount">The fade amount on old events</label>
-        </p>
+		</fieldset>
 
-    </fieldset>
-
-    <div>
-        <input type="button" onclick="resetForm()" value="Reset">
-        <input id="as" type="button" onclick="save()" value="Apply &amp; Save">
-        <input id="antp" type="button" onclick="go2antp()" value="Back to ANTP">
-    </div>
-
-</form>
+		<div>
+			<input type="button" onclick="resetForm()" value="Reset">
+			<input id="as" type="button" onclick="save()" value="Apply &amp; Save">
+			<input id="antp" type="button" onclick="go2antp()" value="Back to ANTP">
+		</div>		
+	</section>
+	
+	<section id="updates">
+		<h1>Update</h1>
+		
+	</section>
+	
 </body>
 </html>
