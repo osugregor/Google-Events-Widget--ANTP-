@@ -48,10 +48,11 @@ input:focus,
 button:focus,
 select:focus,
 textarea:focus {
-  -webkit-box-shadow: #0066ff 0 0 5px 0;
-  -moz-box-shadow: #0066ff 0 0 5px 0;
-  -o-box-shadow: #0066ff 0 0 5px 0;
-  box-shadow: #0066ff 0 0 5px 0;
+  /* Glow effect */
+  -webkit-box-shadow: #333 0 0 5px 0;
+  -moz-box-shadow: #333 0 0 5px 0;
+  -o-box-shadow: #333 0 0 5px 0;
+  box-shadow: #333 0 0 5px 0;
   z-index: 1;
 }
 

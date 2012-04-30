@@ -1,10 +1,10 @@
 <!--
    - For https://chrome.google.com/webstore/detail/mgmiemnjjchgkmgbeljfocdjjnpjnmcg
    -->
-<script src="js/jquery.js"></script>
-<script src="js/ext-core.js"></script>
-<script src="js/calendar.js"></script>
-<script src="js/helpers.js"></script>
+<script src="js/jquery.js" type="text/javascript"></script>
+<script src="js/ext-core.js" type="text/javascript"></script>
+<script src="js/calendar.js" type="text/javascript"></script>
+<script src="js/helpers.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 	// Learn more about poke v2 here:
@@ -42,7 +42,7 @@
             app = MyGoogleCal.Application;
         window.localStorage.removeItem('events'); //clear events from storage
         gcal.source = 'shayko-GoogleEventsANTP-1';
-        gcal.useGoogleLogin = (w.getPref('useGoogleApps')!='1') ? false : true;
+        gcal.useGoogleLogin = (w.getPref('useGoogleApps')=='1');
         w.setPref("offset", 0);
         app.initialize();
 
@@ -74,6 +74,7 @@
         function update(force) {
 
             log("[NOTICE] Updating Background Page");
+            localStorage["bg_reloading"] = "true";
 
             if (force) {
                 log("[NOTICE] Forced Update!");
@@ -113,7 +114,7 @@
 			}
 			
             localStorage["events"] = JSON.stringify(events);
-            widget_notify("bg_updating", false);
+            localStorage["bg_reloading"] = false;
         }
 
         var observer = {

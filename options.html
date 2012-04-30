@@ -26,7 +26,8 @@
 		}
 	
 		h1 {
-			margin: 18px 0 13px;
+            margin: 0;
+			padding: 18px 0 13px;
 			color: #5C6166;
 			font-size: 1.5em;
 			font-weight: normal;			
@@ -34,6 +35,8 @@
 		}
 		
 		section h1 {
+            margin: 0 0 12px 0;
+            color: #303942;
 			border-bottom: 1px solid #F7F7F7;
 		}
 		
@@ -43,8 +46,11 @@
 		}
 		
 		header {
-			padding: 0 30px 10px 4px;
-			margin: 0 0 0 20px;
+            height: 100%;
+            z-index: 10;
+            background: #FFF;
+            position: absolute;
+			padding: 0 2px 0 24px;
 		}
 		
 		header h1 {
@@ -53,35 +59,47 @@
 			background-position: center left;
 			background-repeat: no-repeat;
 		}
-		
-		header .github {
-			font-size: 1.2em;
-		}
-		
-		nav {
-			list-style: none;
-		}
-		
-		header nav li {
+
+		header nav div {
 			color: #999;
-			margin: 5px 0;
-			cursor: pointer;			
+			margin: 0 0 5px -24px;
+			cursor: pointer;
 			text-transform: uppercase;
+            border-left: 6px solid #FFF;
+            padding-left: 18px;
+            -webkit-user-select: none;
 		}
 		
-		header nav li.selected {
-			color: #464E5A;
+		header nav div.selected {
+            border-left-color: #464E5A;
 		}
-		
-		.link {
+        header nav div.selected, header nav div:hover {
+            color: #464E5A;
+        }
+
+        .link {
 			margin-top: 5px;
 			margin-bottom: 5px;
 			text-align: center;
 		}
 		
 		section {
-			display: none;
+            position: absolute;
+            left: -2000px;
+            top: 0;
+            width: 700px;
+            opacity: 0;
+            z-index: 1;
+            -webkit-transition-property: opacity, left;
+            -webkit-transition-duration: 100ms, 100ms;
+
 		}
+
+        section.selected {
+            left: 150px;
+            opacity: 1;
+            z-index: 2;
+        }
 		
 		/* Sizing for generic form elemnts */
         .number input { width: 36px; }
@@ -94,17 +112,50 @@
 		
         fieldset {
             padding: 0;
-            margin-bottom: 10px;
+            margin: 0 0 25px;
             border: 0;
         }
 
-        fieldset legend {
+        fieldset legend, h2 {
 			color: #7A7A7A;
             font-size: 1.2em;
-			padding: 0 0 5px 0;
+			padding: 0 0 10px 0;
             font-family: Rockwell, Helvetica, Arial, serif;
+            font-weight: bold;
+            margin: 0;
         }
 
+        h2:not(.first) {
+            margin-top: 30px;
+        }
+
+        h3 {
+            margin-bottom: 0;
+            margin-left: 18px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        fieldset div {
+            margin-left: 20px;
+        }
+
+        #buttons {
+            margin-top: 20px;
+        }
+
+        .wunderkit {
+            display: inline-block;
+            background: url('images/Wunderkit-Icon-Large.png');
+            width: 30px;
+            height: 30px;
+            background-repeat: no-repeat;
+            background-position-y: 2px;
+        }
+
+        .about_buttons {
+            margin: 20px;
+        }
     </style>
 
     <script>
@@ -131,7 +182,14 @@
         }
 
         $(document).ready(function() {
+
             resetForm();
+
+            $('nav div').click(function(){
+                var section = $(this).attr('data-section');
+                $(this).addClass('selected').siblings('div').removeClass('selected');
+                $('section#' + section).addClass('selected').siblings('section').removeClass('selected');
+            });
         });
     </script>
 
@@ -141,15 +199,13 @@
 	<header>
 		<h1>Events</h1>
 		<nav>
-			<li>About</li>
-			<li>Settings</li>
-			<li>Update</li>
+			<div data-section="about">About</div>
+			<div data-section="settings" class="selected">Settings</div>
+			<div data-section="updates">Updates</div>
 		</nav>
 		<aside id="links">
-			<button class="zocial link github">
-				<span>Fork Me</span>
-			</button>
-			<form class="link" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+			<a href="https://github.com/osugregor/Google-Events-Widget--ANTP-" target="_blank" class="zocial link github">Fork Me</a>
+			<form class="link" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
 				<input type="hidden" name="cmd" value="_s-xclick">
 				<input type="hidden" name="hosted_button_id" value="ANFB97FRS7ADG">
 				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
@@ -157,13 +213,30 @@
 			</form>
 		</aside>
 	</header>
-	
+
 	<section id="about">
 		<h1>About</h1>
-		
+        <h2 class="first">Contribute</h2>
+        If you want to support this project, please make a donation below or contribute on GitHub!!<br/>
+        <div class="about_buttons">
+            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=ANFB97FRS7ADG" target="_blank" class="zocial paypal" title="Like this extension? Help support its continued development by making a donation.">Contribute via Paypal!</a>
+        </div>
+        I'll keep on developing and adding new features to this piece of software.
+
+        <h2>Gregory Shayko - Developer</h2>
+        I am a Computer Science and Engineering student at The Ohio State University. Check out <a href="http://www.greg.shaykos.com" target="_blank">my site</a> or one of my social mediums below:
+        <div class="about_buttons">
+            <a href="http://www.linkedin.com/pub/gregory-shayko/28/78b/b88" target="_blank" class="zocial icon linkedin">View my LinkedIn Profile</a>
+            <a href="https://plus.google.com/118088941611474924231" target="_blank" class="zocial icon googleplus">View my Google+ Page</a>
+            <a href="http://www.facebook.com/OSUGregor" target="_blank" class="zocial icon facebook">View my Facebook Profile</a>
+            <a href="https://github.com/osugregor" target="_blank" class="zocial icon github">Visit my GitHub Page</a>
+            <a href="https://www.wunderkit.com/#/google-events-widget-antp" target="_blank" class="wunderkit" title="Project Management Site"></a>
+            <a href="http://greg.shaykos.com/calendar" target="_blank" class="zocial icon cal">Open my Google Calendar</a>
+            <a href="mailto:greg@shaykos.com" class="zocial icon email">Send me an email</a>
+        </div>
 	</section>
-	
-	<section id="settings" style="display: inline-block;">
+
+	<section id="settings" class="selected">
 		<h1>Settings</h1>
 		<fieldset>
 			<legend>Calendar Settings</legend>
@@ -185,17 +258,37 @@
 
 		</fieldset>
 
-		<div>
+		<div id="buttons">
 			<input type="button" onclick="resetForm()" value="Reset">
 			<input id="as" type="button" onclick="save()" value="Apply &amp; Save">
 			<input id="antp" type="button" onclick="go2antp()" value="Back to ANTP">
-		</div>		
+		</div>
 	</section>
-	
+
 	<section id="updates">
-		<h1>Update</h1>
-		
+		<h1>Updates</h1>
+        <h2 class="first">Version 1.2.1</h2>
+        <ul>
+            <li>Improved the options page layout</li>
+            <li>Optimized the notifications on the front end</li>
+            <li>Improved the refresh capabilities</li>
+        </ul>
+
+        <h2>Version 1.2.0</h2>
+        <ul>
+            <li>Added the ability to refresh the current events if any exist</li>
+        </ul>
+
+        <h2>Version 1.1.0</h2>
+        <ul>
+            <li>Added previous event fading</li>
+            <li>Included an options page</li>
+        </ul>
+        <h3>Bug Fixes</h3>
+        <ul>
+            <li>Fixed the inability to scroll events</li>
+        </ul>
 	</section>
-	
+
 </body>
 </html>

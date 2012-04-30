@@ -31,17 +31,11 @@
 		$(document).ready(function() {
 
             var w = Blz.Widget;
+            var reloading = true, //Keeps track if the bg is reloading
+                reloading_timeout = false; //Checks if the min reload time has hit
+            var mouse_over_header = false;
             var local_storage_events = localStorage.getItem("events") || "[]";
             var $list = $('#events_ul');
-
-
-            $('.google-header').mouseover(function(){
-                $(this).find('#settings').stop().fadeTo('300', 1);
-                $(this).find('#refresh').stop().fadeTo('300', 1);
-            }).mouseout(function(){
-                $(this).find('#settings').stop().fadeTo(1200, .2);
-                $(this).find('#refresh').stop().fadeTo(1200, .2);
-            });
 
             log('Initial Storage', localStorage);
 
@@ -69,6 +63,8 @@
                     }
                 }
                 localStorage['widget_notify'] = JSON.stringify(widget_notifications);
+                reloading =  !!(localStorage.getItem("bg_reloading") == "true");
+                refreshButton();
 
                 //Check if any events changed or where added
                 if(widget_update || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0)){
@@ -84,8 +80,23 @@
                 localStorage['bg_update'] = true;
             }
 
+            function refreshButton(force){
+                if(reloading || force){
+                    $('#refresh').addClass('spin');
+                    reloading_timeout = true;
+                    setTimeout(function(){
+                        reloading_timeout = false;
+                        $(window).trigger('storage');
+                    }, 1000);
+                }else{
+                    if(!reloading_timeout){
+                        $('#refresh').removeClass('spin');
+                    }
+                }
+            }
+
             $('#refresh').click(function(){
-                notify("bg_updating", "<center>Refreshing...</center>");
+                refreshButton(true);
                 updateBG();
             });
 
@@ -215,8 +226,8 @@
 	<div id="events" class="ui-mobile-viewport ui-overlay-a" data-role="page" data-theme="a">
         <div class="google-header" data-role="header" data-theme="b">
             <h1><a href="https://www.google.com/calendar/" target="_top"  data-role="none">Google Calendar</a></h1>
-            <a id="settings" data-role="none" href="options.html" target="_top"><span data-role="none"></span></a>
-            <span id="refresh" data-role="none"></span>
+            <a id="settings" class="control" data-role="none" href="options.html" target="_top"><span data-role="none"></span></a>
+            <span id="refresh" class="control" data-role="none"></span>
         </div><!-- /header -->
 
         <ul id="events_ul" data-role="listview" data-inline="true" data-theme="a" data-divider-theme="c"></ul>

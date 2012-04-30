@@ -1,6 +1,6 @@
 {
     "name": "Google Events [ANTP]",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "Google event widget for Awesome New Tab Page [ANTP]",
     "icons": {
         "16": "images/128.png",

@@ -3,9 +3,52 @@ body {
 	margin: 0;
 }
 
+.google-header {
+    -webkit-user-select: none;
+}
+
 .google-header h1 a {
 	text-decoration: none;
 	color: inherit;
+}
+
+.google-header #settings, .google-header #refresh {
+    opacity: .2;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 1000ms;
+}
+
+.google-header #refresh.spin {
+    opacity: 1;
+}
+
+.google-header:hover #settings, .google-header:hover #refresh{
+    opacity: 1;
+    -webkit-transition-duration: 500ms;
+}
+
+
+#settings {
+    background: url('../images/cog.png');
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    /* right: 5px; */
+    top: 9px;
+    left: 7px;
+    cursor: pointer;
+}
+
+#refresh {
+    background: url('../images/arrow_refresh.png');
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    /* right: 5px; */
+    top: 8px;
+    right: 7px;
+    cursor: pointer;
+    opacity: .2;
 }
 
 #events_ul {
@@ -44,30 +87,6 @@ body {
 
 #events_ul .notification {
     padding: 4px;
-}
-
-#settings {
-    background: url('../images/cog.png');
-    width: 16px;
-    height: 16px;
-    position: absolute;
-    /* right: 5px; */
-    top: 9px;
-    left: 7px;
-    cursor: pointer;
-    opacity: .2;
-}
-
-#refresh {
-    background: url('../images/arrow_refresh.png');
-    width: 16px;
-    height: 16px;
-    position: absolute;
-    /* right: 5px; */
-    top: 8px;
-    right: 7px;
-    cursor: pointer;
-    opacity: .2;
 }
 
 
