@@ -2,7 +2,7 @@
  Logging Functions
  */
 function log(msg, obj){
-    //return;
+    return;
     if(typeof obj === 'undefined' || obj == null){
         console.log("%s", msg);
     }else{

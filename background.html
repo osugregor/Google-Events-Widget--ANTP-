@@ -95,7 +95,7 @@
             // Check if were currently waiting for calendars
             if (app.isCalendarListRequesting()) {
                 log("[WARNING] Calendar is already requesting.");
-                widget_notify('calendars_requesting', "Updating Calendars...");
+                //widget_notify('calendars_requesting', "Updating Calendars...");
                 return;
             }else widget_notify('calendars_requesting', false);
             // Check if we have any calendars
