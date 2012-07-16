@@ -10,5 +10,5 @@
     "default_locale": "en",
     "background_page": "background.html",
     "options_page": "options.html",
-    "permissions": [ "tabs", "http://*.google.com/", "https://*.google.com/", "https://*.google-analytics.com" ]
+    "permissions": [ "tabs", "http://*.google.com/", "https://*.google.com/", "https://*.google-analytics.com/" ]
 }
