@@ -13,40 +13,6 @@ Blz.Util = {
         return a
     }
 };
-Blz.Ajax = {
-    get: function (a, d, c, b) {
-        Ext.Ajax.request({
-            method: "GET",
-            url: a,
-            params: c,
-            headers: b,
-            callback: function (f, g, e) {
-                d({
-                    success: g,
-                    data: e.responseText,
-                    response: e,
-                    options: f
-                })
-            }
-        })
-    },
-    post: function (b, a, d, c) {
-        Ext.Ajax.request({
-            method: "POST",
-            url: b,
-            params: a,
-            headers: c,
-            callback: function (f, g, e) {
-                d({
-                    success: g,
-                    data: e.responseText,
-                    response: e,
-                    options: f
-                })
-            }
-        })
-    }
-};
 
 /************************************************
                    Notifier
@@ -383,7 +349,8 @@ Blz.GData = {
             d = g || this.createSessionUrl();
         var f = this;
         f.isLoginRequesting = true;
-        Blz.Ajax.post(c, a, function (h) {
+        log("Blz.GData.login: Sending Login Reguest", a);
+        jQuery.post(c, a, function (h) {
             f.isLoginRequesting = false;
             if (h.success) {
                 if (h.success = f.parseAuthContent(h.data)) {
@@ -400,7 +367,7 @@ Blz.GData = {
                 f.authContent = "";
                 f.notifyObservers("LoginCompleted", h)
             }
-        })
+        });
     },
     logout: function () {
         if (this.isLoginRequesting) {
@@ -438,7 +405,7 @@ Blz.GData = {
                     var j = this.getAllResponseHeaders();
                     for (var f = 0, e = j.length; f < e; f++) {
                         var g = j[f];
-                        if (match = /gsessionid=([\w-_]+)$/.exec(j[f])) {
+                        if (match = /gsessionid=([A-Za-z0-9_-]+)$/.exec(j[f])) {
                             d.gsessionid = match[1];
                             d.hasSession = true
                         }
@@ -467,7 +434,7 @@ Blz.GData = {
     },
     parseAuthContent: function (b) {
         var a;
-        if (a = /Auth=([\w-_]+)/.exec(b)) {
+        if (a = /Auth=([A-Za-z0-9_-]+)/.exec(b)) {
             this.authContent = a[1];
             return true
         }
@@ -691,52 +658,57 @@ Blz.Google.Calendar = {
     createSessionUrl: function () {
         return this.baseUrl + "/" + this.getAccount() + "/private/full"
     },
+
     retrieveCalendar: function (c) {
-        var a = Blz.Widget;
-        var d = this;
-        if (this.isCalendarListRequesting) {
-            return
-        }
+        var _this = this; //Store this
+
+        //Check were not already retreiving and we have a session
+        if (this.isCalendarListRequesting) { return }
         if (!this.hasSession) {
-            a.print("Blz.Google.Calendar.retrieveCalendar: no session");
+            Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar: no session");
             this.session();
             return false
         }
-        var b = this.baseUrl + "/" + this.getAccount() + "/allcalendars/full";
-        if (this.gsessionid != "") {
-            b += "?gsessionid=" + this.gsessionid
-        }
-        var f = {};
-        var e = this.getAuthHeader();
-        this.isCalendarListRequesting = true;
 
-        Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar --Sending Request--");
-        Blz.Ajax.get(b, function (h) {
+        //Setup the url that will query the Gcal feed
+        var url = this.baseUrl + "/" + this.getAccount() + "/allcalendars/full";
+        if (this.gsessionid != "") {
+            url += "?gsessionid=" + this.gsessionid
+        }
+        Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar --Sending Request-- ", url);
+        this.isCalendarListRequesting = true;
+        jQuery.ajax({
+            url: url,
+            data: {},
+            headers: this.getAuthHeader()
+        }).success(function (data, textStatus, response) {
             try {
-                d.isCalendarListRequesting = false;
-                Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar --Request Received--");
-                Blz.Widget.debug(h);
-                var j = h.response,
-                    i = h.success,
-                    g = h.data,
-                    k = [];
-                if (j.status != 200) {
-                    a.print("[WARNING] Blz.Google.Calendar.retrieveCalendar: Http Status = " + j.status)
+                _this.isCalendarListRequesting = false;
+                Blz.Widget.print("Blz.Google.Calendar.retrieveCalendar --Request Received-- Response:", response);
+
+                var k = [],
+                    success = (textStatus == "success");
+                if (response.status != 200) {
+                    Blz.Widget.print("[WARNING] Blz.Google.Calendar.retrieveCalendar: Http Status = " + repsonse.status)
                 }
-                if (i) {
-                    k = d.parseCalendars(g)
-                } else {} if (j.status == 401) {
-                    d.hasSession = false
+                if (success) {
+                    k = _this.parseCalendars(response.responseText);
+                } else {} if (response.status == 401) {
+                    _this.hasSession = false
                 }
-                d.notifyObservers("CalendarRetrieved", {
-                    success: i,
+                _this.notifyObservers("CalendarRetrieved", {
+                    success: success,
                     context: c,
                     items: k
                 })
-            } catch (h) {
-                Blz.Widget.print("[ERROR] Blz.Google.Calendar.retrieveCalendar:" + h)
+            } catch (err) {
+                Blz.Widget.print("[ERROR] Blz.Google.Calendar.retrieveCalendar:" + err.message)
             }
-        }, f, e)
+        }).error(function(response, status, error){
+            Blz.Widget.debug("Blz.Google.Calendar.retrieveCalendar --Request Failed--\n", [response, status, error]);
+        }).complete(function(){
+            _this.isCalendarListRequesting = false;
+        });
     },
     parseCalendars: function (b) {
         var h = Blz.Widget,
@@ -784,54 +756,64 @@ Blz.Google.Calendar = {
             hidden: f
         }
     },
-    retrieveEvent: function (e, g, c) {
+    retrieveEvent: function (e, data, c) {
         var d = this,
             a = Blz.Widget;
-        if (!g) {
-            g = {}
+        if (!data) {
+            data = {}
         }
-        var b = e.link;
+        var url = e.link;
 		
 		//Additional google paramters
-		g.singleevents = true;
-        g.orderby = "starttime";
-        g['max-results'] = 100000;
+        data.singleevents = true;
+        data.orderby = "starttime";
+        data['max-results'] = 100000;
 		
         if (this.gsessionid != "") {
-            b += "?gsessionid=" + this.gsessionid
+            url += "?gsessionid=" + this.gsessionid
         }
         if (!this.hasSession) {
             a.print("Blz.Google.Calendar.retrieveEvent: no session!");
-            this.session(b);
+            this.session(url);
             return false
         }
-        var f = this.getAuthHeader();
-        Blz.Ajax.get(b, function (m) {
+        var headers = this.getAuthHeader();
+        jQuery.ajax({
+            url: url,
+            data: data,
+            headers: headers
+        }).success(function(data, textStatus, response) {
+            Blz.Widget.print("Blz.Google.Calendar.retrieveEvent --Request Received--");
             try {
-                var o = m.response,
-                    n = m.success,
-                    l = m.data,
+                var success = (textStatus == "success"),
                     k = [];
-                if (o.status != 200) {
-                    a.print("Blz.Google.Calendar.retrieveEvent: Http Status = " + o.status)
+                if (response.status != 200) {
+                    a.print("Blz.Google.Calendar.retrieveEvent: Http Status = " + response.status)
                 }
-                if (n) {
-                    k = d.parseEvents(l);
+                if (success) {
+                    k = d.parseEvents(response.responseText);
                     for (var j = 0, h = k.length; j < h; j++) {
                         k[j].color = e.color
                     }
-                } else {} if (o.status == 401) {
+                } else {} if (response.status == 401) {
                     d.hasSession = false
                 }
                 d.notifyObservers("EventRetrieved", {
-                    success: n,
+                    success: success,
                     context: c,
                     items: k
                 })
             } catch (m) {
                 Blz.Widget.print("Blz.Google.Calendar.retrieveEvent: " + m)
             }
-        }, g, f)
+        }).error(function(response, status, error){
+            Blz.Widget.print("Blz.Google.Calendar.retrieveEvent --Request Failed--");
+            Blz.Widget.debug(response);
+            Blz.Widget.debug(status);
+            Blz.Widget.debug(error);
+        }).complete(function(){
+            d.isCalendarListRequesting = false;
+        });
     },
     parseEvents: function (h) {
         var c = [];
@@ -974,18 +956,26 @@ Blz.Widget = {
         widget_notify: "{}",
         event_old_fade_amount: .4
     },
-    debug: function (a) {},
-    print: function (a) {},
+    debug: function (a, b) {},
+    print: function (a, b) {},
     setPref: function (a, b) {},
     getPref: function (a) { return "bb"; },
     getResourceString: function (a) { return ""; }
 };
 Blz.Util.extend(Blz.Widget, {
-    debug: function (a) {
-        //console.log("[DEBUG] %o", a);
+    debug: function (a, obj) {
+        if(typeof obj === 'undefined' || obj == null){
+            log("(BLZ)[DEBUG] %o", a);
+        }else{
+            log(a,obj);
+        }
     },
-    print: function (a) {
-        //console.log("(BLZ) " + a)
+    print: function (a, obj) {
+        if(typeof obj === 'undefined' || obj == null){
+            log("(BLZ) " + a)
+        }else{
+            log(a,obj);
+        }
     },
     setPref: function (a, b) {
         try {
@@ -1111,7 +1101,7 @@ MyGoogleCal.Application = {
     },
     retrieveAllCalendar: function () {
         this.clearCache();
-        this.gcal.retrieveCalendar()
+        this.gcal.retrieveCalendar();
     },
     findFocusEvent: function () {
         if (!this.isLogin() || this.isCalendarListRequesting()) {
@@ -1159,45 +1149,45 @@ MyGoogleCal.Application = {
         }
         return
     },
-    getAppointments: function (d) {
-        var n = Blz.Widget;
+    getAppointments: function (gStartDate) {
         try {
-            var o = d.toKeyString();
-            var a = this.cacheAppts[o] || {
+            var gStartDateKey = gStartDate.toKeyString();
+            var apts = this.cacheAppts[gStartDateKey] || {
                 loaded: false,
                 loading: false
             };
-            if (!a.loaded) {
-                if (!a.loading) {
-                    a.items = {};
-                    a.loading = true;
-                    a.loadingCount = 0;
-					var num_days = n.getPref('days_to_show');
+            if (!apts.loaded) {
+                if (!apts.loading) {
+                    apts.items = {};
+                    apts.loading = true;
+                    apts.loadingCount = 0;
+					var num_days = Blz.Widget.getPref('days_to_show');
                     num_days = (!isNaN(num_days)) ? num_days : 5;
-                    var f = d.date;
-                    var c = new Date(f.getFullYear(), f.getMonth(), f.getDate(), 0, 0, 0, 0);
-                    var h = new Date(f.getFullYear(), f.getMonth(), f.getDate(), 23 * num_days, 59, 59, 0);
+                    var startDate = gStartDate.date;
+                    var startMin = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0);
+                    var startMax = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), (24 * num_days) - 1, 59, 59, 0);
                     var g = {
-                        "start-min": Blz.GData.Date.toDateString(c),
-                        "start-max": Blz.GData.Date.toDateString(h)
+                        "start-min": Blz.GData.Date.toDateString(startMin),
+                        "start-max": Blz.GData.Date.toDateString(startMax)
                     };
-                    n.print("MyGoogleCal.Application.getAppointments from " + g["start-min"] + " to " + g["start-max"]);
+                    Blz.Widget.debug("MyGoogleCal.Application.getAppointments from " + g["start-min"] + " to " + g["start-max"]);
+                    Blz.Widget.debug("MyGoogleCal Gcal Cache Calendars", this.gcal.cacheCalendars);
                     var m = this.gcal.cacheCalendars;
                     for (var j = 0, k = m.length; j < k; j++) {
                         var b = m[j];
                         this.gcal.retrieveEvent(b, g, {
-                            dt: o,
+                            dt: gStartDateKey,
                             calid: b.id
                         });
-                        a.loadingCount++
+                        apts.loadingCount++
                     }
-                    this.cacheAppts[o] = a
+                    this.cacheAppts[gStartDateKey] = apts
                 }
             }
-        } catch (l) {
-            n.print("MyGoogleCal.Application.getAppointments: " + l)
+        } catch (err) {
+            Blz.Widget.print("MyGoogleCal.Application.getAppointments: " + err)
         }
-        return a
+        return apts
     },
     ellipseString: function (a) {
         if (this.length > a) {
