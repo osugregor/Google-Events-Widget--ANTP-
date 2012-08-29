@@ -1,5 +1,6 @@
 {
     "name": "Google Events [ANTP]",
+    "manifest_version": 2,
     "version": "1.2.1",
     "description": "Google event widget for Awesome New Tab Page [ANTP]",
     "icons": {
@@ -8,7 +9,13 @@
         "128": "images/128.png"
     },
     "default_locale": "en",
-    "background_page": "background.html",
+    "background": {
+        "page": "background.html"
+    },
     "options_page": "options.html",
-    "permissions": [ "tabs", "http://*.google.com/", "https://*.google.com/", "https://*.google-analytics.com" ]
+    "permissions": [ "tabs", "http://*.google.com/", "https://*.google.com/", "https://*.google-analytics.com/" ],
+    "content_security_policy": "script-src 'self' https://*.google-analytics.com/; object-src 'self'",
+    "web_accessible_resources": [
+        "widget.html"
+    ]
 }

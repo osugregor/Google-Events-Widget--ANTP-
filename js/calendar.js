@@ -14,34 +14,32 @@ Blz.Util = {
     }
 };
 Blz.Ajax = {
-    get: function (a, d, c, b) {
-        Ext.Ajax.request({
-            method: "GET",
-            url: a,
-            params: c,
-            headers: b,
-            callback: function (f, g, e) {
-                d({
-                    success: g,
-                    data: e.responseText,
-                    response: e,
-                    options: f
+    get: function (url, callback, data, headers) {
+        jQuery.ajax(url, {
+            type: "GET",
+            data: data,
+            headers: headers,
+            complete: function(jqXHR, textStatus){
+                callback({
+                    success: jqXHR.status,
+                    data: jqXHR.responseText,
+                    response: jqXHR,
+                    options: jqXHR.getAllResponseHeaders()
                 })
             }
         })
     },
-    post: function (b, a, d, c) {
-        Ext.Ajax.request({
-            method: "POST",
-            url: b,
-            params: a,
-            headers: c,
-            callback: function (f, g, e) {
-                d({
-                    success: g,
-                    data: e.responseText,
-                    response: e,
-                    options: f
+    post: function (url, data, callback, headers) {
+        jQuery.ajax(url, {
+            type: "POST",
+            data: data,
+            headers: headers,
+            complete: function(jqXHR, textStatus){
+                callback({
+                    success: jqXHR.status,
+                    data: jqXHR.responseText,
+                    response: jqXHR,
+                    options: jqXHR.getAllResponseHeaders()
                 })
             }
         })
