@@ -1,17 +1,18 @@
 {
+	
     "name": "Google Events [ANTP]",
     "manifest_version": 2,
-    "version": "1.2.1",
+    "version": "1.3.0",
     "description": "Google event widget for Awesome New Tab Page [ANTP]",
-    "icons": {
+    "background": {
+		"scripts": [ "lib/jquery.min.js", "lib/moment.min.js", "lib/moment.lang-all.min.js", "js/shayjs.js", "js/shayjs.utils.js", "js/shayjs.antp.widget.js", "js/shayjs.google.js", "js/background.js" ]
+	},
+	"icons": {
         "16": "images/128.png",
         "48": "images/128.png",
         "128": "images/128.png"
     },
     "default_locale": "en",
-    "background": {
-        "page": "background.html"
-    },
     "options_page": "options.html",
     "permissions": [ "tabs", "http://*.google.com/", "https://*.google.com/", "https://*.google-analytics.com/" ],
     "content_security_policy": "script-src 'self' https://*.google-analytics.com/; object-src 'self'",
