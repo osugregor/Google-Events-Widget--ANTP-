@@ -1,11 +1,11 @@
 //Browser On Load Event
 $(document).ready(function() {
 
-    var w = Blz.Widget;
+    var Widget = ShayJS.antp.Widget;
     var reloading = true, //Keeps track if the bg is reloading
         reloading_timeout = false; //Checks if the min reload time has hit
     var mouse_over_header = false;
-    var local_storage_events = localStorage.getItem("events") || "[]";
+    var local_storage_events = ShayJS.get("events") || "{}";
     var $list = $('#events_ul');
 
     log('Initial Storage', localStorage);
@@ -13,13 +13,13 @@ $(document).ready(function() {
     // When anything in localStorage changes
     $(window).bind('storage', function () {
         log("[EVENT] Storage Changed", localStorage);
-        var incoming_events = localStorage.getItem("events") || "";
-        var widget_update = !!(localStorage.getItem("widget_update") == "true");
-        var widget_notifications = JSON.parse(w.getPref('widget_notify'));
-        var widget_alerts = JSON.parse(w.getPref('widget_alert'));
+        var incoming_events = ShayJS.get("events") || "";
+        var widget_update = Widget.requireUpdate();
+        var widget_notifications = JSON.parse(Widget.getNotifications());
+        var widget_alerts = JSON.parse(Widget.getAlerts());
 
         // Alerts, block out the calendar
-        refresh_alerts(widget_alerts);
+        showAlerts(widget_alerts);
 
         // Notifications are deletable via user
         for(key in widget_notifications){
@@ -33,14 +33,14 @@ $(document).ready(function() {
                 notify(key, widget_notifications[key]);
             }
         }
-        localStorage['widget_notify'] = JSON.stringify(widget_notifications);
-        reloading =  !!(localStorage.getItem("bg_reloading") == "true");
+        localStorage[Widget.KEY_NOTIFICATIONS] = JSON.stringify(widget_notifications);
+        reloading =  Widget.isFetching();
         refreshButton();
 
         //Check if any events changed or where added
-        if(widget_update || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0)){
-            log("[NOTICE] Some events have changed. Forced=" + widget_update);
-            localStorage.removeItem("widget_update");
+        if(Widget.requireUpdate() || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0)){
+            log("[NOTICE] Some events have changed. Forced=" + Widget.requireUpdate());
+            Widget.requireUpdate(false);
             local_storage_events = incoming_events;
             updateContent();
         }
@@ -88,25 +88,25 @@ $(document).ready(function() {
 
         //<ul data-role="listview" data-theme="a" data-divider-theme="c">
         $list.children(":not(.notification)").remove();
-        var displayDayCount = w.getPref('days_to_show'), offset = 0;
+        var displayDayCount = ShayJS.get('days_to_show', ShayJS.Google.Calendar), offset = 0;
         for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
             offset = index;
-            var cStart = new Blz.GData.Date().addDays(offset).resetHours(),
-                cEnd = new Date(cStart.date.getFullYear(), cStart.date.getMonth(), cStart.date.getDate(), 23, 59, 59, 0);
+            var cStart = new Date().addDays(offset).resetHours(),
+                cEnd = new Date(cStart.date.getFullYear(), cStart.date.getMonth(), cStart.date.getDate(), 23, 59, 59, 0); 
 
             var header = getHeaderDateString(cStart);
             if (offset == 0) header += ' - ' + getResourceString('TODAY');
             else if (offset == 1) header += ' - ' + getResourceString('TOMORROW');
             $list.append($.fn._cal_header(header, 0));
 
-            events.sort($.fn.appointmentCompare);
+            //events.sort($.fn.appointmentCompare);
 
             for (var i=0, len=events.length; i<len; i++) {
 
                 //convert start/end to date object
                 var event = events[i];
-                event.start = new Date(event.start);
-                event.end = new Date(event.end);
+                //event.start = new Date(event.start);
+                //event.end = new Date(event.end);
                 //Check if the event belongs in this day
                 if(event.end<=cStart.date||event.start>=cEnd) continue;
 
@@ -126,7 +126,6 @@ $(document).ready(function() {
 
         }
 
-        $list.listview('refresh');
         update_cal_header_counts($list);
 
         $list.bind('mousewheel', function(e, d) {
@@ -155,7 +154,7 @@ $(document).ready(function() {
     }
 
     /* Alerts the user with the object of given events */
-    function refresh_alerts(alerts){
+    function showAlerts(alerts){
         var key = null;
         if(Object.keys(alerts).length == 0){
             $("#loader-box").stop().animate({top: $("body").height(), opacity: 0}, 500, function(){

@@ -4,7 +4,7 @@ var info = {
     "poke"    :   3,              // poke version 2
     "width"   :   1,              // 406 px default
     "height"  :   2,              // 200 px default
-    "path"    :   "widget.html",
+    "path"    :   "GoogleEvents.html",
     "v2"      :   {
         "resize"    :   false,  // Set to true ONLY if you create a range below.
         "min_width" :   1,
