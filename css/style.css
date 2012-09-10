@@ -1,12 +1,29 @@
 body {
+  color: white;
 	padding: 0;
 	margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
 }
 
+/***************************
+        Main Header
+****************************/
 .google-header {
-    -webkit-user-select: none;
+  border: 1px solid #456f9a;
+  color: #FFF;
+  font-size: .47em;
+  font-weight: bold;
+  text-shadow: 0 -1px  1px  #254f7a;
+  background: #5e87b0;
+  background-image: -webkit-gradient(linear, left top, left bottom, from( #81a8ce ), to( #5e87b0 )); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient( #81a8ce , #5e87b0 ); /* Chrome 10+, Saf5.1+ */
+  background-image:         linear-gradient( #81a8ce , #5e87b0 );
+  -webkit-user-select: none;
 }
-
+.google-header h1 {
+  margin: 7px 0 5px;
+  text-align: center;
+}
 .google-header h1 a {
 	text-decoration: none;
 	color: inherit;
@@ -17,17 +34,13 @@ body {
     -webkit-transition-property: opacity;
     -webkit-transition-duration: 1000ms;
 }
-
 .google-header #refresh.spin {
     opacity: 1;
 }
-
 .google-header:hover #settings, .google-header:hover #refresh{
     opacity: 1;
     -webkit-transition-duration: 500ms;
 }
-
-
 #settings {
     background: url('../images/cog.png');
     width: 16px;
@@ -38,7 +51,6 @@ body {
     left: 7px;
     cursor: pointer;
 }
-
 #refresh {
     background: url('../images/arrow_refresh.png');
     width: 16px;
@@ -51,10 +63,43 @@ body {
     opacity: .2;
 }
 
+/***************************
+           Events
+****************************/
 #events_ul {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	height: 371px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.day_header {
+  border: 1px solid #B3B3B3;
+  
+  color: #3E3E3E;
+  font-weight: bold;
+  font-size: .8em;
+  text-shadow: 0 1px 1px #ffffff ;
+  padding: 3px 4%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  outline: 0 !important;
+  background: #e9eaeb;
+  background-image: -webkit-gradient(linear, left top, left bottom, from( #f0f0f0 ), to( #e9eaeb )); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient( #f0f0f0 , #e9eaeb ); /* Chrome 10+, Saf5.1+ */
+  background-image:         linear-gradient( #f0f0f0 , #e9eaeb );
+}
+
+.event-count {
+  float: right;
+}
+
+.event-title, .event-time {
+  font-size: .7em;
+  margin: 0;
 }
 
 .event_location {
@@ -64,7 +109,7 @@ body {
 }
 
 #loader-box {
-    top: 406px; /* 35px */
+    top: 406px; 
     height: 100%;
     z-index: 10;
     display: block;

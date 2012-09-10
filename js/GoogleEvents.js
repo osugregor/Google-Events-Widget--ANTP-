@@ -1,3 +1,14 @@
+ShayJS.DEBUG = true;
+
+moment.calendar = {
+    lastDay : '[Yesterday]',
+    sameDay : 'MMM D (ddd) - [Today]',
+    nextDay : 'MMM D (ddd) - [Tomorrow]',
+    lastWeek : 'MMM D (ddd)',
+    nextWeek : 'MMM D (ddd)',
+    sameElse : 'MMM D (ddd)'
+};
+
 //Browser On Load Event
 $(document).ready(function() {
 
@@ -8,11 +19,11 @@ $(document).ready(function() {
     var local_storage_events = ShayJS.get("events") || "{}";
     var $list = $('#events_ul');
 
-    log('Initial Storage', localStorage);
+    ShayJS.log('Initial Storage', localStorage);
 
     // When anything in localStorage changes
     $(window).bind('storage', function () {
-        log("[EVENT] Storage Changed", localStorage);
+        ShayJS.log("[EVENT] Storage Changed", localStorage);
         var incoming_events = ShayJS.get("events") || "";
         var widget_update = Widget.requireUpdate();
         var widget_notifications = JSON.parse(Widget.getNotifications());
@@ -24,12 +35,12 @@ $(document).ready(function() {
         // Notifications are deletable via user
         for(key in widget_notifications){
             if(key == "base"){
-                log("NOTIFICATION: '" + widget_notifications[key] + "'");
+                ShayJS.log("NOTIFICATION: '" + widget_notifications[key] + "'");
                 for(base_key in widget_notifications.base)
                     notify(widget_notifications.base[base_key]);
                 delete widget_notifications.base;
             }else{
-                log("NOTIFICATION: [" + key + "] = '" + widget_notifications[key] + "'");
+                ShayJS.log("NOTIFICATION: [" + key + "] = '" + widget_notifications[key] + "'");
                 notify(key, widget_notifications[key]);
             }
         }
@@ -39,7 +50,7 @@ $(document).ready(function() {
 
         //Check if any events changed or where added
         if(Widget.requireUpdate() || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0)){
-            log("[NOTICE] Some events have changed. Forced=" + Widget.requireUpdate());
+            ShayJS.log("[NOTICE] Some events have changed. Forced=" + Widget.requireUpdate());
             Widget.requireUpdate(false);
             local_storage_events = incoming_events;
             updateContent();
@@ -47,7 +58,7 @@ $(document).ready(function() {
     });
 
     function updateBG(){
-        log("[NOTICE] SENT BG UPDATE");
+        ShayJS.log("[NOTICE] SENT BG UPDATE");
         localStorage['bg_update'] = true;
     }
 
@@ -76,52 +87,49 @@ $(document).ready(function() {
      and displays them.
      */
     function updateContent(){
-        events = JSON.parse(local_storage_events);
-        events == null ? events = [] : true;
-        log("[DEBUG] Updating Content with Events: ", events);
+        //parse and wrap JSON objects
+        var events = JSON.parse(local_storage_events) || [];
+        $.each(events, function(index, value) { 
+            value.start = moment(value.start);
+            value.end = moment(value.end);
+        });
+        ShayJS.log("[DEBUG] Updating Content with Events: ", events);
 
         var now = new Date();
-        var eventCount = 0, displayEventCount = 0;
-        if (events.length == 0) {
-            return;
-        }
+        var eventCount = 0;
+        if (events.length == 0) { return; }//leave if no events
 
         //<ul data-role="listview" data-theme="a" data-divider-theme="c">
-        $list.children(":not(.notification)").remove();
-        var displayDayCount = ShayJS.get('days_to_show', ShayJS.Google.Calendar), offset = 0;
-        for (var index = 0, showDays = (!isNaN(displayDayCount)) ? displayDayCount : 5; index < showDays; index++) {
-            offset = index;
-            var cStart = new Date().addDays(offset).resetHours(),
-                cEnd = new Date(cStart.date.getFullYear(), cStart.date.getMonth(), cStart.date.getDate(), 23, 59, 59, 0); 
+        $list.children(":not(.notification)").remove(); // Clear all events
 
-            var header = getHeaderDateString(cStart);
-            if (offset == 0) header += ' - ' + getResourceString('TODAY');
-            else if (offset == 1) header += ' - ' + getResourceString('TOMORROW');
-            $list.append($.fn._cal_header(header, 0));
+        var days_to_show = ShayJS.get('days_to_show', ShayJS.Google.Calendar);
+        var current_day_offset = 0;//keeps track of which day we are on 
 
-            //events.sort($.fn.appointmentCompare);
+        // Loop every day for days_to_show
+        for (current_day_offset; current_day_offset < days_to_show; current_day_offset++) {
+            var current_day_start = new moment().add('days', current_day_offset).sod();
+            var current_day_end = current_day_start.clone().eod();
 
-            for (var i=0, len=events.length; i<len; i++) {
+            $list.append($.fn._cal_header(current_day_start.calendar(), 0));
+
+            var len = events.length;
+            for (var i=0, len; i<len; i++) {
 
                 //convert start/end to date object
                 var event = events[i];
-                //event.start = new Date(event.start);
-                //event.end = new Date(event.end);
-                //Check if the event belongs in this day
-                if(event.end<=cStart.date||event.start>=cEnd) continue;
+                if(event.end.toDate() <= current_day_start.toDate() || event.start.toDate() >= current_day_end.toDate()) continue;
 
                 eventCount++;
 
-                var location = (event.location && event.location.length > 0) ? event.location : '';
-                var time = (event.allDay) ? getResourceString('ALL_DAY_EVENT') : getTimeString(event.start);
-                var color = $.xcolor.lighten(event.color, 3, 25);
-                var remain = (now < event.start) ? getRemainTimeString(event.start) : '';
+                var location = event.location || '';
+                var time = (event.allDay) ? l('ALL_DAY_EVENT') : getTimeString(event.start);
+                var color = $.xcolor.lighten(event.feed.color || "#FFFFFF", 3, 25);
+                var remain = moment.humanizeDuration(event.start);
                 var tooltip = [event.title,time,remain,location].join(' ');
 
                 var $li = $.fn._cal_event(event.title, location, time, event.link, color);
                 if(event.allDay == 0 && event.end < now) $li.css('opacity', w.getPref('event_old_fade_amount'));
                 $list.append($li.attr({title:tooltip}));
-                displayEventCount++;
             }
 
         }
@@ -137,9 +145,9 @@ $(document).ready(function() {
     }
 
     function update_cal_header_counts($list){
-        $list.find('li[data-role="list-divider"]').each(function(){
-            var total = $(this).nextUntil('li[data-role="list-divider"]').length;
-            $(this).find('span.ui-li-count').html(total);
+        $list.find('.day_header').each(function(){
+            var total = $(this).nextUntil('.day_header').length;
+            $(this).find('span.event-count').html(total);
         });
     }
 
@@ -151,6 +159,28 @@ $(document).ready(function() {
             if(name != "" && $list.find('.notification-' + name).length > 0)return;
             $list.prepend($('<li/>').html(msg).addClass('notification').addClass('notification-' + name).css('cursor', 'notallowed').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','alert').attr('data-theme','e').click(function(){ $(this).slideUp(function(){ $(this).remove();})}));
         }
+    }
+
+    /*
+    Pretty print of a date 
+    */
+    function getTimeString(date) {
+        if (date) {
+            var use24 = 0;//TODO...FIX w.getPref('use24HourTime');
+            var partOne = date.hours(), partTwo = date.minutes(), amPM = '';
+            if (use24==0) {
+                if (partOne > 12) {
+                    partOne = partOne - 12;
+                    amPM = ' PM';
+                } else {
+                    amPM = (partOne == 12) ? ' PM' : ' AM';
+                }
+                if (partOne == 0) partOne = 12;
+            }
+            if (partTwo < 10) partTwo = '0' + partTwo;
+            return partOne + ':' + partTwo + amPM;
+        }
+        return '';
     }
 
     /* Alerts the user with the object of given events */

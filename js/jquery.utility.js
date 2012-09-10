@@ -7,11 +7,10 @@ $.fn.extend({
     },
     _cal_header: function(title, count){
         //<li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
-        var count = $('<span/>').addClass('ui-li-count').html(count);
-        return $('<li/>').attr('data-role', 'list-divider')
-            .attr('role', 'heading')
+        var count = $('<span/>').addClass('event-count').html(count);
+        return $('<li/>').addClass('day_header')
             .html(title).append(count).click(function(){
-                $(this).nextUntil('li[data-role="list-divider"]').slideToggle();
+                $(this).nextUntil('.day_header').slideToggle();
             });
     },
     _cal_event: function(title, location, time, url, color){
@@ -23,16 +22,16 @@ $.fn.extend({
         //		<p class="ui-li-desc event_location">Location</p>
         //	</a>
         //</li>
-        var li = $('<li/>').addClass('event').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','false');
-        var event_title = $('<h3/>').addClass('ui-li-heading').html(title);
-        var event_time = $('<p/>').addClass('ui-li-aside ui-li-desc').html(time);
+        var li = $('<li/>').addClass('event');
+        var event_title = $('<h3/>').addClass('event-title').html(title);
+        var event_time = $('<p/>').addClass('event-time').html(time);
         var event_details = $('<a/>').attr({href:url,target:'_top'}).html(event_title).append(event_time);
         if(location){
-            var event_location = $('<p/>').addClass('ui-li-desc event_location').html(location);
+            var event_location = $('<p/>').addClass('event-location').html(location);
             event_details.append(event_location);
         }
         li.append(event_color).append(event_details);
-        var event_color = $('<span/>').addClass('ui-li-aside ui-btn-inner event_color').css('height', location ? 30 : 20).css('padding', '0').css('background-color', color);
+        var event_color = $('<span/>').addClass('event_color').css('height', location ? 30 : 20).css('padding', '0').css('background-color', color);
         li.prepend(event_color);
         return li;
     },

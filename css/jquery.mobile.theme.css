@@ -12,8 +12,8 @@
 /* A
 -----------------------------------------------------------------------------------------------------------*/
 
-.ui-bar-a {
-	border: 1px solid 		#2A2A2A /*{a-bar-border}*/;
+.google-header {
+	border: 1px solid 		#333333 /*{a-bar-border}*/;
 	background: 			#111111 /*{a-bar-background-color}*/;
 	color: 					#ffffff /*{a-bar-color}*/;
 	font-weight: bold;

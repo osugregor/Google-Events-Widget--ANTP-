@@ -14,27 +14,7 @@ jQuery.fn.log = function (msg) {
     return this;
 };
 
-/*
-	Pretty print of a date 
-*/
-function getTimeString(date) {
-	if (date) {
-		var use24 = 0;//TODO...FIX w.getPref('use24HourTime');
-		var partOne = date.getHours(), partTwo = date.getMinutes(), amPM = '';
-		if (use24==0) {
-			if (partOne > 12) {
-				partOne = partOne - 12;
-				amPM = ' PM';
-			} else {
-				amPM = (partOne == 12) ? ' PM' : ' AM';
-			}
-			if (partOne == 0) partOne = 12;
-		}
-		if (partTwo < 10) partTwo = '0' + partTwo;
-		return partOne + ':' + partTwo + amPM;
-	}
-	return '';
-}
+
 
 /* 
 	Given a date, returns the remaining time as a string
