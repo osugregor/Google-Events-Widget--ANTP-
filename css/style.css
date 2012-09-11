@@ -1,8 +1,40 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+ol, ul {
+  list-style: none;
+}
+
+/*
+  Start of stylesheet
+*/
+
 body {
   color: white;
-	padding: 0;
-	margin: 0;
   font-family: Helvetica, Arial, sans-serif;
+  line-height: 1;
 }
 
 /***************************
@@ -10,8 +42,9 @@ body {
 ****************************/
 .google-header {
   border: 1px solid #456f9a;
+  border-bottom: 1px solid rgb(112, 112, 112);
   color: #FFF;
-  font-size: .47em;
+  font-size: .9em;
   font-weight: bold;
   text-shadow: 0 -1px  1px  #254f7a;
   background: #5e87b0;
@@ -21,7 +54,7 @@ body {
   -webkit-user-select: none;
 }
 .google-header h1 {
-  margin: 7px 0 5px;
+  margin: 9px 0 8px;
   text-align: center;
 }
 .google-header h1 a {
@@ -57,7 +90,7 @@ body {
     height: 16px;
     position: absolute;
     /* right: 5px; */
-    top: 8px;
+    top: 9px;
     right: 7px;
     cursor: pointer;
     opacity: .2;
@@ -67,22 +100,29 @@ body {
            Events
 ****************************/
 #events_ul {
+  font-size: .9em;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	height: 371px;
   list-style: none;
-  margin: 0;
-  padding: 0;
+}
+
+.event  {
+  font-size: .85em;
+  position: relative;
+  width: 100%;
+  margin-bottom: 1px;
+  border-top: 1px solid #B3B3B3;
 }
 
 .day_header {
-  border: 1px solid #B3B3B3;
-  
+  border-top: 1px solid rgb(160, 160, 160);
   color: #3E3E3E;
   font-weight: bold;
   font-size: .8em;
   text-shadow: 0 1px 1px #ffffff ;
-  padding: 3px 4%;
+  padding: .55em 4%;
+  position: relative;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -93,19 +133,51 @@ body {
   background-image:         linear-gradient( #f0f0f0 , #e9eaeb );
 }
 
+.day_header:first-child {
+  border-top: none;
+}
+
 .event-count {
-  float: right;
+  padding: .55em;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
-.event-title, .event-time {
-  font-size: .7em;
-  margin: 0;
+.event-details {
+  display: block;
+  margin-left: 8px;
+  padding: .24em 0 .21em;
+  cursor: pointer;
 }
 
-.event_location {
+.event_color {
+  width: 5px;
+  height: 100%; /* With location is 30px, without is 20px */
+  background: red;
+  border-right: 1px solid #222;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.event-title {
+  max-width: 63%;
+  /*text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;*/
+}
+
+.event-time {
+  position: absolute;
+  right: .25em;
+  top: .28em;
+}
+
+.event-location {
 	font-style: italic;
-	font-size: 10px;
-	margin-top: -3px;
+	font-size: .7em;
+  padding-top: .2em;
 }
 
 #loader-box {
@@ -119,16 +191,6 @@ body {
 
 #loader-box a { color: #5E87B0;}
 #loader-box a:hover { color: #E47911;}
-
-.event_color {
-	float: left;
-	width: 5px;
-	height: 30px; /* With location is 30px, without is 20px */
-	background: red;
-	border-right: 1px solid #222;
-	margin-top: -1px;
-	padding: 0;
-}
 
 #events_ul .notification {
     padding: 4px;

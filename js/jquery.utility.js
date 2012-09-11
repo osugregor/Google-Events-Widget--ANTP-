@@ -13,7 +13,7 @@ $.fn.extend({
                 $(this).nextUntil('.day_header').slideToggle();
             });
     },
-    _cal_event: function(title, location, time, url, color){
+    _cal_event: function(title, location, time, url, color, event_num){
         //<li data-corners="false" data-shadow="false" data-icon="false">
         //	<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
         //	<a href="index.html">
@@ -23,16 +23,19 @@ $.fn.extend({
         //	</a>
         //</li>
         var li = $('<li/>').addClass('event');
-        var event_title = $('<h3/>').addClass('event-title').html(title);
-        var event_time = $('<p/>').addClass('event-time').html(time);
-        var event_details = $('<a/>').attr({href:url,target:'_top'}).html(event_title).append(event_time);
+        if(event_num == 0){
+            li.addClass('first');
+        }
+        var event_title = $('<div/>').addClass('event-title').html(title);
+        var event_time = $('<div/>').addClass('event-time').html(time);
+        var event_color = $('<div/>').addClass('event_color').css('background-color', color);
+        var event_details = $('<a/>').addClass('event-details').attr({href:url,target:'_top'}).html(event_title).append(event_time);
         if(location){
             var event_location = $('<p/>').addClass('event-location').html(location);
-            event_details.append(event_location);
+            event_details.append(event_location)
+            li.addClass('has_Location');
         }
-        li.append(event_color).append(event_details);
-        var event_color = $('<span/>').addClass('event_color').css('height', location ? 30 : 20).css('padding', '0').css('background-color', color);
-        li.prepend(event_color);
+        li.append(event_details).prepend(event_color);
         return li;
     },
     appointmentCompare: function (d, c) {

@@ -6,11 +6,11 @@ var info = {
     "height"  :   2,              // 200 px default
     "path"    :   "GoogleEvents.html",
     "v2"      :   {
-        "resize"    :   false,  // Set to true ONLY if you create a range below.
+        "resize"    :   true,  // Set to true ONLY if you create a range below.
         "min_width" :   1,
-        "max_width" :   1,
+        "max_width" :   2,
         "min_height":   1,
-        "max_height":   2
+        "max_height":   3
     },
     "v3"      :   {
         "multi_placement": false // Allows the widget to be placed more than once

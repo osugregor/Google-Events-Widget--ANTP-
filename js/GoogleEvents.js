@@ -113,7 +113,7 @@ $(document).ready(function() {
             $list.append($.fn._cal_header(current_day_start.calendar(), 0));
 
             var len = events.length;
-            for (var i=0, len; i<len; i++) {
+            for (var i=0; i<len; i++) {
 
                 //convert start/end to date object
                 var event = events[i];
@@ -127,7 +127,7 @@ $(document).ready(function() {
                 var remain = moment.humanizeDuration(event.start);
                 var tooltip = [event.title,time,remain,location].join(' ');
 
-                var $li = $.fn._cal_event(event.title, location, time, event.link, color);
+                var $li = $.fn._cal_event(event.title, location, time, event.link, color, i);
                 if(event.allDay == 0 && event.end < now) $li.css('opacity', w.getPref('event_old_fade_amount'));
                 $list.append($li.attr({title:tooltip}));
             }
@@ -147,7 +147,7 @@ $(document).ready(function() {
     function update_cal_header_counts($list){
         $list.find('.day_header').each(function(){
             var total = $(this).nextUntil('.day_header').length;
-            $(this).find('span.event-count').html(total);
+            $(this).find('span.event-count').html(total == 0 ? '' : total);
         });
     }
 

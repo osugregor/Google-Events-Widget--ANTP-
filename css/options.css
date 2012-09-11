@@ -1,0 +1,143 @@
+body {
+	margin: 0;
+	font-size: 12px;
+	font-family: 'Open Sans', sans-serif;
+}
+
+@font-face {
+  font-family: "Zocial";
+  src: url('../fonts/zocial/zocial-regular-webfont.eot');
+  /* src: url('/fonts/zocial/zocial-regular-webfont.eot?iefix') format('eot'), url('/fonts/zocial/zocial-regular-webfont.woff') format('woff'), url('/fonts/zocial/zocial-regular-webfont.ttf') format('truetype'), url('/fonts/zocial/zocial-regular-webfont.svg') format('svg');*/
+}
+
+h1 {
+    margin: 0;
+	padding: 18px 0 13px;
+	color: #5C6166;
+	font-size: 1.5em;
+	font-weight: normal;			
+	-webkit-user-select: none;
+}
+
+section h1 {
+    margin: 0 0 12px 0;
+    color: #303942;
+	border-bottom: 1px solid #F7F7F7;
+}
+
+section, header {
+	display: inline-block;
+	vertical-align: top;
+}
+
+header {
+    height: 100%;
+    z-index: 10;
+    background: #FFF;
+    position: absolute;
+	padding: 0 2px 0 24px;
+}
+
+header h1 {
+	padding-left: 20px;
+	background: url('../images/16.png');
+	background-position: center left;
+	background-repeat: no-repeat;
+}
+
+header nav div {
+	color: #999;
+	margin: 0 0 5px -24px;
+	cursor: pointer;
+	text-transform: uppercase;
+    border-left: 6px solid #FFF;
+    padding-left: 18px;
+    -webkit-user-select: none;
+}
+
+header nav div.selected {
+    border-left-color: #464E5A;
+}
+header nav div.selected, header nav div:hover {
+    color: #464E5A;
+}
+
+.link {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	text-align: center;
+}
+
+section {
+    position: absolute;
+    left: -2000px;
+    top: 0;
+    width: 700px;
+    opacity: 0;
+    z-index: 1;
+    -webkit-transition-property: opacity, left;
+    -webkit-transition-duration: 100ms, 100ms;
+
+}
+
+section.selected {
+    left: 150px;
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Sizing for generic form elemnts */
+.number input { width: 36px; }
+.alpha input { width: 30px; }
+
+#settings label {
+    margin-left: 10px;
+    color: #999;
+}
+
+fieldset {
+    padding: 0;
+    margin: 0 0 25px;
+    border: 0;
+}
+
+fieldset legend, h2 {
+	color: #7A7A7A;
+    font-size: 1.2em;
+	padding: 0 0 10px 0;
+    font-family: Rockwell, Helvetica, Arial, serif;
+    font-weight: bold;
+    margin: 0;
+}
+
+h2:not(.first) {
+    margin-top: 30px;
+}
+
+h3 {
+    margin-bottom: 0;
+    margin-left: 18px;
+    color: #666;
+    font-weight: normal;
+}
+
+fieldset div {
+    margin-left: 20px;
+}
+
+#buttons {
+    margin-top: 20px;
+}
+
+.wunderkit {
+    display: inline-block;
+    background: url('../images/Wunderkit-Icon-Large.png');
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-position-y: 2px;
+}
+
+.about_buttons {
+    margin: 20px;
+}
