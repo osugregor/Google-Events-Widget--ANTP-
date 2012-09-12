@@ -9,12 +9,13 @@ moment.calendar = {
     sameElse : 'MMM D (ddd)'
 };
 
+var init_load = true;
+
 //Browser On Load Event
 $(document).ready(function() {
 
     var Widget = ShayJS.antp.Widget;
-    var reloading = true, //Keeps track if the bg is reloading
-        reloading_timeout = false; //Checks if the min reload time has hit
+    var reloading_timeout = false; //Checks if the min reload time has hit
     var mouse_over_header = false;
     var local_storage_events = ShayJS.get("events") || "{}";
     var $list = $('#events_ul');
@@ -45,7 +46,6 @@ $(document).ready(function() {
             }
         }
         localStorage[Widget.KEY_NOTIFICATIONS] = JSON.stringify(widget_notifications);
-        reloading =  Widget.isFetching();
         refreshButton();
 
         //Check if any events changed or where added
@@ -54,16 +54,18 @@ $(document).ready(function() {
             Widget.requireUpdate(false);
             local_storage_events = incoming_events;
             updateContent();
+        }else{
+            //No changes occured, display a notification
+            if(!init_load){
+                notify('no_changes','No Changes Occured');
+            }
         }
+        init_load = false;
     });
 
-    function updateBG(){
-        ShayJS.log("[NOTICE] SENT BG UPDATE");
-        localStorage['bg_update'] = true;
-    }
 
     function refreshButton(force){
-        if(reloading || force){
+        if(Widget.isFetching() || force){
             $('#refresh').addClass('spin');
             reloading_timeout = true;
             setTimeout(function(){
@@ -79,7 +81,8 @@ $(document).ready(function() {
 
     $('#refresh').click(function(){
         refreshButton(true);
-        updateBG();
+        ShayJS.log("[NOTICE] SENT BG FETCH");
+        ShayJS.antp.Widget.shouldFetch(true);
     });
 
     /*
@@ -100,48 +103,60 @@ $(document).ready(function() {
         if (events.length == 0) { return; }//leave if no events
 
         //<ul data-role="listview" data-theme="a" data-divider-theme="c">
-        $list.children(":not(.notification)").remove(); // Clear all events
+        $list.slideUp(function(){
+            $(this).html('');
+            $(this).show();
+        
 
-        var days_to_show = ShayJS.get('days_to_show', ShayJS.Google.Calendar);
-        var current_day_offset = 0;//keeps track of which day we are on 
+            var days_to_show = ShayJS.get('days_to_show', ShayJS.Google.Calendar);
+            var current_day_offset = 0;//keeps track of which day we are on 
 
-        // Loop every day for days_to_show
-        for (current_day_offset; current_day_offset < days_to_show; current_day_offset++) {
-            var current_day_start = new moment().add('days', current_day_offset).sod();
-            var current_day_end = current_day_start.clone().eod();
+            // Loop every day for days_to_show
+            for (current_day_offset; current_day_offset < days_to_show; current_day_offset++) {
+                var current_day_start = new moment().add('days', current_day_offset).sod();
+                var current_day_end = current_day_start.clone().eod();
 
-            $list.append($.fn._cal_header(current_day_start.calendar(), 0));
+                $list.append($.fn._cal_header(current_day_start.calendar(), 0));
 
-            var len = events.length;
-            for (var i=0; i<len; i++) {
+                var len = events.length;
+                for (var i=0; i<len; i++) {
 
-                //convert start/end to date object
-                var event = events[i];
-                if(event.end.toDate() <= current_day_start.toDate() || event.start.toDate() >= current_day_end.toDate()) continue;
+                    //convert start/end to date object
+                    var event = events[i];
+                    if(event.end.toDate() <= current_day_start.toDate() || event.start.toDate() >= current_day_end.toDate()) continue;
 
-                eventCount++;
+                    eventCount++;
 
-                var location = event.location || '';
-                var time = (event.allDay) ? l('ALL_DAY_EVENT') : getTimeString(event.start);
-                var color = $.xcolor.lighten(event.feed.color || "#FFFFFF", 3, 25);
-                var remain = moment.humanizeDuration(event.start);
-                var tooltip = [event.title,time,remain,location].join(' ');
+                    var location = event.location || '';
+                    var description = event.description || '';
+                    var time = (event.allDay) ? l('ALL_DAY_EVENT') : getTimeString(event.start);
+                    var color = $.xcolor.lighten(event.feed.color || "#FFFFFF", 3, 25);
+                    //var remain = event.start.duration().humanize();//moment().from(event.start);
+                    var remain = event.start.from();
+                    var tooltip = event.title;
+                    if(description)tooltip = tooltip +'\n' + description;
+                    tooltip = tooltip + '\n' + time + ': ' + remain;
+                    if(location)tooltip = tooltip +'\n' + location;
 
-                var $li = $.fn._cal_event(event.title, location, time, event.link, color, i);
-                if(event.allDay == 0 && event.end < now) $li.css('opacity', w.getPref('event_old_fade_amount'));
-                $list.append($li.attr({title:tooltip}));
+                    var $li = $.fn._cal_event(event.title, location, time, event.url, color, i);
+                    if(!event.allDay && (event.end < now)){
+                        $li.css('opacity', ShayJS.get('event_old_fade_amount'));
+                    }
+                    $list.append($li.attr({title:tooltip}));
+                }
+
             }
 
-        }
+            update_cal_header_counts($list);
 
-        update_cal_header_counts($list);
+            $list.bind('mousewheel', function(e, d) {
+                var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
+                if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
+                    e.preventDefault();
+                }
+            });
 
-        $list.bind('mousewheel', function(e, d) {
-            var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
-            if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
-                e.preventDefault();
-            }
-        });
+        })
     }
 
     function update_cal_header_counts($list){
@@ -154,10 +169,31 @@ $(document).ready(function() {
     function notify(name, msg){
         if(arguments.length == 1){ msg = name; name = ""; }
         if(msg == "" || msg === false){
-            $list.find('.notification-' + name).slideUp(function(){ $(this).remove(); })
+            $list.siblings('.notification-' + name).slideUp(function(){ $(this).remove(); })
         }else{
-            if(name != "" && $list.find('.notification-' + name).length > 0)return;
-            $list.prepend($('<li/>').html(msg).addClass('notification').addClass('notification-' + name).css('cursor', 'notallowed').attr('data-corners','false').attr('data-shadow','false').attr('data-icon','alert').attr('data-theme','e').click(function(){ $(this).slideUp(function(){ $(this).remove();})}));
+            if(name != "" && $list.siblings('.notification-' + name).length > 0)return;
+
+            var notification = $('<div/>');
+
+            var timer = setTimeout(function() { notification.click(); }, 4000);
+            
+            notification.html(msg)
+                .addClass('notification')
+                .addClass('notification-' + name)
+                .css('cursor', 'notallowed')
+                .attr('data-corners','false')
+                .attr('data-shadow','false')
+                .attr('data-icon','alert')
+                .attr('data-theme','e')
+                .click(function(){ 
+                    $(this).slideUp(function(){ 
+                        $(this).remove();
+                    });
+                    clearTimeout(timer);
+                })
+                .insertBefore($list);
+
+            
         }
     }
 

@@ -6,7 +6,6 @@ $.fn.extend({
         return this;
     },
     _cal_header: function(title, count){
-        //<li data-role="list-divider" role="heading">Date<span class="ui-li-count">2</span></li>
         var count = $('<span/>').addClass('event-count').html(count);
         return $('<li/>').addClass('day_header')
             .html(title).append(count).click(function(){
@@ -14,18 +13,8 @@ $.fn.extend({
             });
     },
     _cal_event: function(title, location, time, url, color, event_num){
-        //<li data-corners="false" data-shadow="false" data-icon="false">
-        //	<span class="ui-li-aside ui-btn-inner event_color" style="padding: 0"></span>
-        //	<a href="index.html">
-        //		<h3 class="ui-li-heading">Event Title</h3>
-        //		<p class="ui-li-aside ui-li-desc"><strong>12:00</strong>PM</p>
-        //		<p class="ui-li-desc event_location">Location</p>
-        //	</a>
-        //</li>
+
         var li = $('<li/>').addClass('event');
-        if(event_num == 0){
-            li.addClass('first');
-        }
         var event_title = $('<div/>').addClass('event-title').html(title);
         var event_time = $('<div/>').addClass('event-time').html(time);
         var event_color = $('<div/>').addClass('event_color').css('background-color', color);

@@ -33,7 +33,7 @@ ol, ul {
 
 body {
   color: white;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   line-height: 1;
 }
 
@@ -79,7 +79,6 @@ body {
     width: 16px;
     height: 16px;
     position: absolute;
-    /* right: 5px; */
     top: 9px;
     left: 7px;
     cursor: pointer;
@@ -89,7 +88,6 @@ body {
     width: 16px;
     height: 16px;
     position: absolute;
-    /* right: 5px; */
     top: 9px;
     right: 7px;
     cursor: pointer;
@@ -107,77 +105,87 @@ body {
   list-style: none;
 }
 
+#events_ul .day_header {
+  border-bottom: 1px solid #CCC;
+}
+
+#events_ul .day_header:last-child {
+  border-bottom: none;
+}
+
 .event  {
-  font-size: .85em;
   position: relative;
   width: 100%;
-  margin-bottom: 1px;
-  border-top: 1px solid #B3B3B3;
+  margin-bottom: 2px;
+}
+
+.event + .event {
+  border-top: 1px solid rgba(255, 255, 255, .2);
 }
 
 .day_header {
-  border-top: 1px solid rgb(160, 160, 160);
-  color: #3E3E3E;
+  color: #505050;
   font-weight: bold;
-  font-size: .8em;
-  text-shadow: 0 1px 1px #ffffff ;
-  padding: .55em 4%;
-  position: relative;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
   outline: 0 !important;
+  overflow: hidden;
+  padding: .47em .25em .43em;
+  position: relative;
+  text-shadow: 0px 1px 1px #ffffff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background: #e9eaeb;
   background-image: -webkit-gradient(linear, left top, left bottom, from( #f0f0f0 ), to( #e9eaeb )); /* Saf4+, Chrome */
   background-image: -webkit-linear-gradient( #f0f0f0 , #e9eaeb ); /* Chrome 10+, Saf5.1+ */
   background-image:         linear-gradient( #f0f0f0 , #e9eaeb );
 }
 
-.day_header:first-child {
-  border-top: none;
-}
-
 .event-count {
-  padding: .55em;
+  font-weight: normal;
+  padding: .47em .5em .43em;
   position: absolute;
   right: 0;
   top: 0;
 }
 
-.event-details {
-  display: block;
-  margin-left: 8px;
-  padding: .24em 0 .21em;
+.event-details {  
+  color: inherit;
   cursor: pointer;
+  display: block;  
+  margin-left: 5px;
+  padding: .35em 0 .23em .3em;
+  text-decoration: none;
+}
+
+.event:hover { 
+  background-image: -webkit-gradient(linear, left top, left bottom, from( rgba(255, 255, 255, 0.44) ), to( rgba(233, 234, 235, 0) )); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient( rgba(255, 255, 255, 0.44) , rgba(233, 234, 235, 0) );
+  background-image:         linear-gradient( rgba(255, 255, 255, 0.44) , rgba(233, 234, 235, 0) );
 }
 
 .event_color {
-  width: 5px;
-  height: 100%; /* With location is 30px, without is 20px */
   background: red;
-  border-right: 1px solid #222;
-  position: absolute;
+  box-shadow: rgba(0, 0, 0, 0.34) 0px 0px 1px 1px inset;
+  height: 100%; /* With location is 30px, without is 20px */
   left: 0;
-  top: 0;
+  margin-top: 1px;
+  position: absolute;  
+  width: 5px;
+  top: 0px;
 }
 
 .event-title {
-  max-width: 63%;
-  /*text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;*/
+  max-width: 65%;
 }
 
 .event-time {
   position: absolute;
-  right: .25em;
-  top: .28em;
+  right: .35em;
+  top: .38em;
 }
 
 .event-location {
 	font-style: italic;
 	font-size: .7em;
-  padding-top: .2em;
 }
 
 #loader-box {
@@ -192,8 +200,19 @@ body {
 #loader-box a { color: #5E87B0;}
 #loader-box a:hover { color: #E47911;}
 
-#events_ul .notification {
-    padding: 4px;
+.notification {
+  border-bottom: 1px solid #ECBD00;
+  color: #505050;
+  cursor: not-allowed;
+  font-size: .75em;
+  font-weight: bold;
+  padding: 0.6em .5em;
+  text-align: center;
+  text-shadow: 0px 1px 1px #ffffff;
+  background: #FFDD2A;
+  background-image: -webkit-gradient(linear, left top, left bottom, from( #FFFAC3 ), to( #FFDD2A )); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient( #FFFAC3 , #FFDD2A ); /* Chrome 10+, Saf5.1+ */
+  background-image:         linear-gradient( #FFFAC3 , #FFDD2A );
 }
 
 
@@ -218,4 +237,18 @@ body {
 }
 ::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+
+.spin {
+  -webkit-animation:spin 1s infinite linear;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform:rotate(0deg); }
+  100% { -webkit-transform:rotate(360deg); }
+}
+@-webkit-keyframes spinoff {
+  0% { -webkit-transform:rotate(0deg); }
+  100% { -webkit-transform:rotate(-360deg); }
 }
