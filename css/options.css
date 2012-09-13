@@ -87,8 +87,8 @@ section.selected {
 }
 
 /* Sizing for generic form elemnts */
-.number input { width: 36px; }
-.alpha input { width: 30px; }
+.number input { width: 50px; }
+.alpha input { width: 45px; }
 
 #settings label {
     margin-left: 10px;

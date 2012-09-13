@@ -65,7 +65,7 @@
 			<legend>Calendar Settings</legend>
 
 			<div class="days_to_show number">
-				<input type="text" name="days_to_show" id="days_to_show"/>
+				<input type="number" step="1" min="1" max="1000" id="days_to_show" required />
 				<label for="days_to_show">Number of days to load</label>
 			</div>
 
@@ -75,7 +75,7 @@
 			<legend>Theme Settings</legend>
 
 			<div class="event_old_fade_amount alpha">
-				<input type="text" name="event_old_fade_amount" id="event_old_fade_amount"/>
+                <input type="number" step=".1" min="0" max="1" id="event_old_fade_amount" required />
 				<label for="event_old_fade_amount">The fade amount on old events</label>
 			</div>
 
@@ -83,7 +83,6 @@
 
 		<div id="buttons">
 			<input id="reset" type="button" value="Reset">
-			<input id="as" type="button" value="Apply &amp; Save">
 			<input id="antp" type="button" value="Back to ANTP">
 		</div>
 	</section>

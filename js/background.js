@@ -34,20 +34,13 @@ chrome.extension.onMessageExternal.addListener(function(request, sender, sendRes
 // Above is the required poke listener
 // DO NOT MODIFY ANY OF THE ABOVE CODE
 
-var gCal = ShayJS.Google.Calendar;
-
-ShayJS.DEBUG = true;
 ShayJS.antp.Widget.init();
 
-//Set the fetch interval to 10 min by default
-ShayJS.set('fetch_interval', 10*60);
-
 // Do a one-time initial fetch on load.
-gCal.fetch();
+ShayJS.Google.Calendar.fetch();
 
 // Fetch every x minutes
 setInterval(function(){
-	console.log("RELOAD");
 	ShayJS.Google.Calendar.fetch();
 }, ShayJS.get('fetch_interval')*1000);
 
@@ -55,24 +48,49 @@ setInterval(function(){
 ShayJS.extend(ShayJS.Google.Calendar, {
 
 	onFetchStart: function(){
-		ShayJS.set("fetching", true);
+        console.log("Fetching Events...");
 		ShayJS.antp.Widget.fetching(true);
 	},
 
 	onFetchComplete: function(events) {
-		ShayJS.log("Fetch Complete!!!!!!!!!!!!");
+		console.log("Fetch Complete! " + events.length + " Events.");
 		ShayJS.set("events", JSON.stringify(events));
+        ShayJS.antp.Widget.alert("NO_SESSION", "");
 		ShayJS.antp.Widget.fetching(false);
-		ShayJS.antp.Widget.update();
-		console.log("Events: " + events.length, events);
-		console.log(localStorage);
+		ShayJS.antp.Widget.shouldUpdate();
 	},	
 	
 	onRequireLogin: function(response) {
-		ShayJS.antp.Widget.alert(l("SESSION_ERROR_ALERT", ["https://www.google.com/calendar/"]));
+		ShayJS.antp.Widget.alert("NO_SESSION", l("SESSION_ERROR_ALERT", ["https://www.google.com/calendar/"]));
+        ShayJS.antp.Widget.fetching(false);
 	},
 	
 	onGetCalendarFail: function() {
-		ShayJS.antp.Widget.alert(l("NOTHING_CALENDARLIST"));
+		ShayJS.antp.Widget.alert("FETCH_FAIL", l("NOTHING_CALENDARLIST"));
+        ShayJS.antp.Widget.fetching(false);
 	}
 });
+
+ShayJS.extend(ShayJS.antp.Widget, {
+    onShouldFetch: function(){
+        ShayJS.Google.Calendar.fetch();
+    }
+});
+
+/* Watch for when the user logs in */
+chrome.tabs.onUpdated.addListener(onTabUpdated);
+function onTabUpdated(tabId, changeInfo) {
+    var url = changeInfo.url;
+    if (!url) return;
+    if ((url.indexOf('//www.google.com/calendar/') != -1) ||
+            ((url.indexOf('//www.google.com/a/') != -1) && (url.lastIndexOf('/acs') == url.length - 4)) ||
+            (url.indexOf('//www.google.com/accounts/') != -1))
+    {
+        // The login screen isn't helpful
+        if (url.indexOf('https://www.google.com/accounts/ServiceLogin?') == 0) {
+            return;
+        }
+        ShayJS.log("background.onTabUpdated: loginStatusChanged");
+        ShayJS.Google.Calendar.fetch();
+    }
+}

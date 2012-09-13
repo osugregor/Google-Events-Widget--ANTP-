@@ -1,5 +1,3 @@
-ShayJS.DEBUG = true;
-
 moment.calendar = {
     lastDay : '[Yesterday]',
     sameDay : 'MMM D (ddd) - [Today]',
@@ -25,42 +23,49 @@ $(document).ready(function() {
     // When anything in localStorage changes
     $(window).bind('storage', function () {
         ShayJS.log("[EVENT] Storage Changed", localStorage);
-        var incoming_events = ShayJS.get("events") || "";
-        var widget_update = Widget.requireUpdate();
-        var widget_notifications = JSON.parse(Widget.getNotifications());
-        var widget_alerts = JSON.parse(Widget.getAlerts());
+        var incoming_events = ShayJS.get("events") || null;
+
+        var widget_notifications = Widget.getNotifications();
+        var widget_alerts = Widget.getAlerts();
 
         // Alerts, block out the calendar
         showAlerts(widget_alerts);
 
         // Notifications are deletable via user
         for(key in widget_notifications){
-            if(key == "base"){
+            if(key == "base" || key == "tmp"){
                 ShayJS.log("NOTIFICATION: '" + widget_notifications[key] + "'");
-                for(base_key in widget_notifications.base)
-                    notify(widget_notifications.base[base_key]);
-                delete widget_notifications.base;
+                notify(key, widget_notifications[key], true);
             }else{
                 ShayJS.log("NOTIFICATION: [" + key + "] = '" + widget_notifications[key] + "'");
                 notify(key, widget_notifications[key]);
             }
         }
-        localStorage[Widget.KEY_NOTIFICATIONS] = JSON.stringify(widget_notifications);
+        Widget.setNotifications(widget_notifications); //Update the notifications...after removal
+
         refreshButton();
 
-        //Check if any events changed or where added
-        if(Widget.requireUpdate() || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0)){
-            ShayJS.log("[NOTICE] Some events have changed. Forced=" + Widget.requireUpdate());
-            Widget.requireUpdate(false);
+        //If no events exists, exit
+        if(incoming_events == null){
+            Widget.shouldUpdate(true);
+            Widget.shouldFetch(true);
+            notify('FETCHING', "Fetching Events...");
+            return;
+        }
+
+        //Check if any events changed or where added, or if the events displayed ar not the events retreived
+        if(Widget.shouldUpdate() || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0) || (incoming_events.length > 0 && $("#events_ul li").length == 0)){
+            ShayJS.log("[NOTICE] Some events have changed. Forced=" + Widget.shouldUpdate());
+            Widget.shouldUpdate(false);
             local_storage_events = incoming_events;
             updateContent();
+            init_load = false;
         }else{
             //No changes occured, display a notification
-            if(!init_load){
-                notify('no_changes','No Changes Occured');
+            if(!init_load && !Widget.isFetching()){
+                //notify('no_changes','No Changes Occured', true);
             }
-        }
-        init_load = false;
+        }        
     });
 
 
@@ -103,60 +108,58 @@ $(document).ready(function() {
         if (events.length == 0) { return; }//leave if no events
 
         //<ul data-role="listview" data-theme="a" data-divider-theme="c">
-        $list.slideUp(function(){
-            $(this).html('');
-            $(this).show();
         
+        $(this).html('');        
 
-            var days_to_show = ShayJS.get('days_to_show', ShayJS.Google.Calendar);
-            var current_day_offset = 0;//keeps track of which day we are on 
+        var days_to_show = ShayJS.get('days_to_show', ShayJS.Google.Calendar);
+        var current_day_offset = 0;//keeps track of which day we are on 
 
-            // Loop every day for days_to_show
-            for (current_day_offset; current_day_offset < days_to_show; current_day_offset++) {
-                var current_day_start = new moment().add('days', current_day_offset).sod();
-                var current_day_end = current_day_start.clone().eod();
+        // Loop every day for days_to_show
+        for (current_day_offset; current_day_offset < days_to_show; current_day_offset++) {
+            var current_day_start = new moment().add('days', current_day_offset).sod();
+            var current_day_end = current_day_start.clone().eod();
 
-                $list.append($.fn._cal_header(current_day_start.calendar(), 0));
+            $list.append($.fn._cal_header(current_day_start.calendar(), 0));
 
-                var len = events.length;
-                for (var i=0; i<len; i++) {
+            var len = events.length;
+            for (var i=0; i<len; i++) {
 
-                    //convert start/end to date object
-                    var event = events[i];
-                    if(event.end.toDate() <= current_day_start.toDate() || event.start.toDate() >= current_day_end.toDate()) continue;
+                //convert start/end to date object
+                var event = events[i];
+                if(event.end.toDate() <= current_day_start.toDate() || (event.start.toDate() >= current_day_end.toDate())) continue;
 
-                    eventCount++;
+                eventCount++;
 
-                    var location = event.location || '';
-                    var description = event.description || '';
-                    var time = (event.allDay) ? l('ALL_DAY_EVENT') : getTimeString(event.start);
-                    var color = $.xcolor.lighten(event.feed.color || "#FFFFFF", 3, 25);
-                    //var remain = event.start.duration().humanize();//moment().from(event.start);
-                    var remain = event.start.from();
-                    var tooltip = event.title;
-                    if(description)tooltip = tooltip +'\n' + description;
-                    tooltip = tooltip + '\n' + time + ': ' + remain;
-                    if(location)tooltip = tooltip +'\n' + location;
+                var location = event.location || '';
+                var description = event.description || '';
+                var time = (event.allDay) ? l('ALL_DAY_EVENT') : getTimeString(event.start);
+                var color = $.xcolor.lighten(event.feed.color || "#FFFFFF", 3, 25);
+                //var remain = event.start.duration().humanize();//moment().from(event.start);
+                var remain = event.start.from();
+                var tooltip = event.title;
+                if(description)tooltip = tooltip +'\n' + description;
+                tooltip = tooltip + '\n' + time + ': ' + remain;
+                if(location)tooltip = tooltip +'\n' + location;
 
-                    var $li = $.fn._cal_event(event.title, location, time, event.url, color, i);
-                    if(!event.allDay && (event.end < now)){
-                        $li.css('opacity', ShayJS.get('event_old_fade_amount'));
-                    }
-                    $list.append($li.attr({title:tooltip}));
+                var $li = $.fn._cal_event(event.title, location, time, event.url, color, i);
+                if(!event.allDay && (event.end < now)){
+                    $li.css('opacity', ShayJS.get('event_old_fade_amount'));
                 }
-
+                $list.append($li.attr({title:tooltip}));
             }
 
-            update_cal_header_counts($list);
+        }
 
-            $list.bind('mousewheel', function(e, d) {
-                var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
-                if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
-                    e.preventDefault();
-                }
-            });
+        update_cal_header_counts($list);
 
-        })
+        $list.bind('mousewheel', function(e, d) {
+            var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
+            if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
+                e.preventDefault();
+            }
+        });
+
+        
     }
 
     function update_cal_header_counts($list){
@@ -166,7 +169,7 @@ $(document).ready(function() {
         });
     }
 
-    function notify(name, msg){
+    function notify(name, msg, tmp){
         if(arguments.length == 1){ msg = name; name = ""; }
         if(msg == "" || msg === false){
             $list.siblings('.notification-' + name).slideUp(function(){ $(this).remove(); })
@@ -175,7 +178,10 @@ $(document).ready(function() {
 
             var notification = $('<div/>');
 
-            var timer = setTimeout(function() { notification.click(); }, 4000);
+            var timer = null;
+            if(tmp){                
+                timer = setTimeout(function() { notification.click(); }, 4000);
+            }
             
             notification.html(msg)
                 .addClass('notification')
@@ -189,9 +195,9 @@ $(document).ready(function() {
                     $(this).slideUp(function(){ 
                         $(this).remove();
                     });
-                    clearTimeout(timer);
+                    if(timer)clearTimeout(timer);
                 })
-                .insertBefore($list);
+                .insertBefore($list).hide().slideDown();
 
             
         }
@@ -230,7 +236,7 @@ $(document).ready(function() {
         }
 
         // Ensure the alert container is visible
-        $("#loader-box").stop().animate({top: "35px", opacity: 1}, 2000, 'easeOutBounce');
+        $("#loader-box").stop().animate({top: $(".google-header").height() + 1, opacity: 1}, 2000, 'easeOutBounce');
 
         // Check if any alerts should be removed
         $("#loader-box h1").each(function(){
@@ -249,7 +255,7 @@ $(document).ready(function() {
         if($("#loader-box h1").length == 0)
             $("#loader-box").stop().animate({top: $("body").height(), opacity: 0}, 500, function(){ $(this).html(""); });
     }
+
     //Trigger storage to show messages
     $(window).trigger('storage');
-    updateContent();
 });

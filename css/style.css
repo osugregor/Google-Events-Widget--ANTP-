@@ -98,7 +98,6 @@ body {
            Events
 ****************************/
 #events_ul {
-  font-size: .9em;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	height: 371px;
@@ -113,22 +112,13 @@ body {
   border-bottom: none;
 }
 
-.event  {
-  position: relative;
-  width: 100%;
-  margin-bottom: 2px;
-}
-
-.event + .event {
-  border-top: 1px solid rgba(255, 255, 255, .2);
-}
-
 .day_header {
   color: #505050;
+  font-size: .75em;
   font-weight: bold;
   outline: 0 !important;
   overflow: hidden;
-  padding: .47em .25em .43em;
+  padding: .47em .6em .43em;
   position: relative;
   text-shadow: 0px 1px 1px #ffffff;
   text-overflow: ellipsis;
@@ -146,6 +136,18 @@ body {
   right: 0;
   top: 0;
 }
+
+.event  {
+  font-size: .75em;
+  position: relative;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.event + .event {
+  border-top: 1px solid rgba(255, 255, 255, .2);
+}
+
 
 .event-details {  
   color: inherit;
@@ -174,7 +176,7 @@ body {
 }
 
 .event-title {
-  max-width: 65%;
+  max-width: 57%;
 }
 
 .event-time {
@@ -189,32 +191,44 @@ body {
 }
 
 #loader-box {
-    top: 406px; 
-    height: 100%;
-    z-index: 10;
-    display: block;
-    margin-top: 0;
-    border-top: black 1px solid;
+  background: rgba(0, 0, 0, .7);
+  border-top: black 1px solid;
+  display: block;
+  height: 100%;  
+  margin-top: 0;  
+  position: absolute;  
+  top: 406px;
+  z-index: 100;
 }
 
 #loader-box a { color: #5E87B0;}
 #loader-box a:hover { color: #E47911;}
 
-.notification {
-  border-bottom: 1px solid #ECBD00;
-  color: #505050;
-  cursor: not-allowed;
-  font-size: .75em;
-  font-weight: bold;
-  padding: 0.6em .5em;
-  text-align: center;
-  text-shadow: 0px 1px 1px #ffffff;
-  background: #FFDD2A;
-  background-image: -webkit-gradient(linear, left top, left bottom, from( #FFFAC3 ), to( #FFDD2A )); /* Saf4+, Chrome */
-  background-image: -webkit-linear-gradient( #FFFAC3 , #FFDD2A ); /* Chrome 10+, Saf5.1+ */
-  background-image:         linear-gradient( #FFFAC3 , #FFDD2A );
+#loader-box h1 {
+  padding: 1em;
 }
 
+.notification {
+  border: 1px solid #F7C942;
+  color: #505050;
+  font-size: .75em;
+  font-weight: bold;
+  padding: 0.4em .35em;
+  text-align: center;
+  text-shadow: 0px 1px 1px #ffffff;
+  background: #FBEF7E;
+  background-image: -webkit-gradient(linear, left top, left bottom, from( #FCEDA7 ), to( #FBEF7E )); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient( #FCEDA7 , #FBEF7E  ); /* Chrome 10+, Saf5.1+ */
+  background-image:         linear-gradient( #FCEDA7 , #FBEF7E  );
+}
+
+.notification:hover {
+  background: #FF3F3F;
+  color: white;
+  cursor: pointer;
+  text-shadow: 0px 1px 1px #000;
+  border: 1px solid #A30000;
+};
 
 /* Scrollbar theming */
 ::-webkit-scrollbar {
