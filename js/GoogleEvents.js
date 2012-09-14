@@ -23,6 +23,11 @@ $(document).ready(function() {
     // When anything in localStorage changes
     $(window).bind('storage', function () {
         ShayJS.log("[EVENT] Storage Changed", localStorage);
+
+        $('#header_text a').html(ShayJS.get('header_text'));
+        if(ShayJS.val('header_color_1') || ShayJS.val('header_color_2')){
+            $('.google-header').css('background-image', '-webkit-linear-gradient( ' + ShayJS.get('header_color_1') + ' , ' + ShayJS.get('header_color_2') + ' )').css('border-color', ShayJS.get('header_color_2'));
+        }
         var incoming_events = ShayJS.get("events") || null;
 
         var widget_notifications = Widget.getNotifications();
@@ -107,7 +112,7 @@ $(document).ready(function() {
         var eventCount = 0;
         if (events.length == 0) { return; }//leave if no events
 
-        //<ul data-role="listview" data-theme="a" data-divider-theme="c">
+        $("body").css('background', ShayJS.val('bg_color') || '');        
 
         $list.html('');
 
@@ -121,6 +126,15 @@ $(document).ready(function() {
 
             if(ShayJS.get("show_events_which_ended") == "true"){
                 current_day_start = current_day_start.sod();
+            }
+
+            if(ShayJS.val("date_format_sameDay"))moment.calendar.sameDay = ShayJS.get("date_format_sameDay");
+            if(ShayJS.val("date_format_nextDay"))moment.calendar.nextDay = ShayJS.get("date_format_nextDay");
+            if(ShayJS.val("date_format_else")){
+                moment.calendar.lastDay = ShayJS.get("date_format_else");
+                moment.calendar.lastWeek = ShayJS.get("date_format_else");
+                moment.calendar.nextWeek = ShayJS.get("date_format_else");
+                moment.calendar.sameElse = ShayJS.get("date_format_else");
             }
 
             $list.append($.fn._cal_header(current_day_start.calendar(), 0));

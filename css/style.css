@@ -48,9 +48,7 @@ body {
   font-weight: bold;
   text-shadow: 0 -1px  1px  #254f7a;
   background: #5e87b0;
-  background-image: -webkit-gradient(linear, left top, left bottom, from( #81a8ce ), to( #5e87b0 )); /* Saf4+, Chrome */
   background-image: -webkit-linear-gradient( #81a8ce , #5e87b0 ); /* Chrome 10+, Saf5.1+ */
-  background-image:         linear-gradient( #81a8ce , #5e87b0 );
   -webkit-user-select: none;
 }
 .google-header h1 {

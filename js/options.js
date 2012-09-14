@@ -16,32 +16,39 @@ function resetForm(){
 }
 
 function reset(input){
-    $(input).val(ShayJS.defaults[$(input).attr('id')]).change();
+    $(input).val(ShayJS.defaults[$(input).attr('id')]).trigger('propertychange');
 }
 
 function save(input) {
     input = $(input);
+    var g_title = "",
+        g_text  = "";
     if(input.val() == ShayJS.defaults[input.attr('id')]){
         ShayJS.remove(input.attr('id'));
+        g_title = "Setting reset to default state";
+        g_text = $("label[for='" + input.attr("id") + "']").text() + " defaulted to '" + input.val() + "'";
     }else{
         ShayJS.set(input.attr('id'), input.val());
-        var tmp = $.gritter.add({
-            title: "Setting Saved",
-            text: $("label[for='" + input.attr("id") + "']").text() + " changed to '" + input.val() + "'",
-            before_open: function(){
-                if($('.gritter-item-wrapper').length >= 3){
-                    // Returning false prevents a new gritter from opening
-                    var unique_id = $("#gritter-notice-wrapper .gritter-item-wrapper:first-child").attr("id");
-                    if($('.gritter-item-wrapper').length >= 4){
-                        $("#gritter-notice-wrapper .gritter-item-wrapper:first-child").remove();
-                    }else{
-                        $.gritter.remove(unique_id.match(/gritter-item-(.*)/)[1],{ speed: 200 });
-                    }
-                    return true;
-                }
-            }
-        });
+        g_title = "Setting Saved";
+        g_text = $("label[for='" + input.attr("id") + "']").text() + " changed to '" + input.val() + "'";
     }
+
+    $.gritter.add({
+        title: g_title,
+        text: g_text,
+        before_open: function(){
+            if($('.gritter-item-wrapper').length >= 3){
+                // Returning false prevents a new gritter from opening
+                var unique_id = $("#gritter-notice-wrapper .gritter-item-wrapper:first-child").attr("id");
+                if($('.gritter-item-wrapper').length >= 4){
+                    $("#gritter-notice-wrapper .gritter-item-wrapper:first-child").remove();
+                }else{
+                    $.gritter.remove(unique_id.match(/gritter-item-(.*)/)[1],{ speed: 200 });
+                }
+                return true;
+            }
+        }
+    });
 	ShayJS.antp.Widget.shouldUpdate(true);
 }
 
@@ -51,7 +58,8 @@ function go2antp() {
 
 $(document).ready(function() {
 
-    $("input,select").change(function(){
+   
+    $("input, select").bind("propertychange change keyup paste", function(event){
         save(this);
     });
 
@@ -79,7 +87,10 @@ $(document).ready(function() {
 
     $(".field").each(function(){
         var resetLink = $("<span/>").html("reset").addClass("reset").click(function(){
-            reset($(this).parent().find("input,select"));
+            $(this).parent().find("input,select").each(function(){
+                reset(this);
+            })
+            
         });
         $(this).append(resetLink);
     });

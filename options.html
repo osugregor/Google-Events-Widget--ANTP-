@@ -70,9 +70,51 @@
                 <label for="days_to_show"><b>Days to Show:</b> the number of days that are visible.</label>
 			</div>
 
+            <div class="field text">
+                <label for="header_text" class="big"><b>Widget Header:</b></label>
+                <input type="text" id="header_text" required />
+                <label for="header_text">The header of the widget.</label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Text Formatting</legend>
+            <p>
+                Dates are created using moment.js. To customize a date, follow the guide here:
+                <a href="http://momentjs.com/docs/#/displaying/format/" target="_blank" title="moment.js formatting guide">Moment JS Formatting</a>
+            </p>
+            <div class="field date_format">
+                <label for="date_format_nextDay" class="big"><b>Date Format Same Day:</b></label>
+                <input type="text" id="date_format_sameDay" required />
+                <label for="date_format_sameDay"> The format of the Date Text.</label>
+            </div>
+
+            <div class="field date_format">
+                <label for="date_format_nextDay" class="big"><b>Date Format Next Day:</b></label>
+                <input type="text" id="date_format_nextDay" required />
+                <label for="date_format_nextDay"> The format of the Date Text.</label>
+            </div>
+
+            <div class="field date_format">
+                <label for="date_format_nextDay" class="big"><b>Date Format Else:</b></label>
+                <input type="text" id="date_format_else" required />
+                <label for="date_format_else"> The format of the Date Text.</label>
+            </div>
+
 		</fieldset>
 
         <h1>Theme Settings</h1>
+        <div class="field color">
+            <input type="color" id="bg_color" required />
+            <label for="bg_color"><b>Background Color</b></label>
+        </div>
+
+        <div class="field color">
+            <input type="color" id="header_color_1" required />
+            <label for="header_color_1"><b><= 1 [Header Color] 2 =></b></label>
+            <input type="color" id="header_color_2" required />
+        </div>
+
         <div class="field color">
             <input type="color" id="date_color" required />
             <label for="date_color"><b>Date Color</b></label>

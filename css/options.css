@@ -91,11 +91,22 @@ input {
     border: 0;
     width: 56px;
 }
-label {
+label { margin-left: 8px; }
+label.big { 
+    display: block;
+    margin-bottom: 5px;
+    margin-left: 0; 
+}
+
+label.big ~ input {
     margin-left: 9px;
 }
+
+.text input { width: 150px; }
+
 .number input { width: 50px; }
 .number label {margin-left: 15px;}
+.date_format input { width: 200px;}
 
 input[type='color']{
     vertical-align: middle;
