@@ -10,17 +10,17 @@ $.fn.extend({
         return $('<li/>').addClass('day_header')
             .html(title).append(count).click(function(){
                 $(this).nextUntil('.day_header').slideToggle();
-            });
+            }).css('color', ShayJS.val('date_color'));
     },
     _cal_event: function(title, location, time, url, color, event_num){
 
         var li = $('<li/>').addClass('event');
-        var event_title = $('<div/>').addClass('event-title').html(title);
-        var event_time = $('<div/>').addClass('event-time').html(time);
+        var event_title = $('<div/>').addClass('event-title').html(title).css('color', ShayJS.val('event_title_color'));        
+        var event_time = $('<div/>').addClass('event-time').html(time).css('color', ShayJS.val('event_time_color'));
         var event_color = $('<div/>').addClass('event_color').css('background-color', color);
         var event_details = $('<a/>').addClass('event-details').attr({href:url,target:'_top'}).html(event_title).append(event_time);
         if(location){
-            var event_location = $('<p/>').addClass('event-location').html(location);
+            var event_location = $('<p/>').addClass('event-location').html(location).css('color', ShayJS.val('event_location_color'));
             event_details.append(event_location)
             li.addClass('has_Location');
         }

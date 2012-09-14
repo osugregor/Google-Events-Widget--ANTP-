@@ -60,24 +60,54 @@
 	</section>
 
 	<section id="settings" class="selected">
+
 		<h1>Settings</h1>
 		<fieldset>
 			<legend>Calendar Settings</legend>
 
-			<div class="days_to_show number">
+			<div class="field number">
 				<input type="number" step="1" min="1" max="1000" id="days_to_show" required />
-				<label for="days_to_show">Number of days to load</label>
+                <label for="days_to_show"><b>Days to Show:</b> the number of days that are visible.</label>
 			</div>
 
 		</fieldset>
 
-		<fieldset>
-			<legend>Theme Settings</legend>
+        <h1>Theme Settings</h1>
+        <div class="field color">
+            <input type="color" id="date_color" required />
+            <label for="date_color"><b>Date Color</b></label>
+        </div>
+        <div class="field color">
+            <input type="color" id="event_title_color" required />
+            <label for="event_title_color"><b>Event Text Color</b></label>
+        </div>
+        <div class="field color">
+            <input type="color" id="event_time_color" required />
+            <label for="event_time_color"><b>Event Time Color</b></label>
+        </div>
+        <div class="field color">
+            <input type="color" id="event_location_color" required />
+            <label for="event_location_color"><b>Event Location Color</b></label>
+        </div>
 
-			<div class="event_old_fade_amount alpha">
+
+		<fieldset>			
+            <legend>Past Events</legend>
+
+            <div class="field">
+                <select id="show_events_which_ended">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>    
+                <label for="show_events_which_ended"><b>Show Past Events:</b> display events that ended before the current time?</label>
+            </div>
+
+			<div class="field">
                 <input type="number" step=".1" min="0" max="1" id="event_old_fade_amount" required />
-				<label for="event_old_fade_amount">The fade amount on old events</label>
+                <label for="event_old_fade_amount"><b>Ended Opacity</b> for events that ended</label>
 			</div>
+
+            
 
 		</fieldset>
 

@@ -154,7 +154,7 @@ body {
   cursor: pointer;
   display: block;  
   margin-left: 5px;
-  padding: .35em 0 .23em .3em;
+  padding: .42em 0 .23em .3em;
   text-decoration: none;
 }
 
@@ -182,16 +182,17 @@ body {
 .event-time {
   position: absolute;
   right: .35em;
-  top: .38em;
+  top: .43em;
 }
 
 .event-location {
 	font-style: italic;
 	font-size: .7em;
+  margin-top: .2em;
 }
 
 #loader-box {
-  background: rgba(0, 0, 0, .7);
+  background: rgba(0, 0, 0, .8);
   border-top: black 1px solid;
   display: block;
   height: 100%;  
@@ -228,7 +229,7 @@ body {
   cursor: pointer;
   text-shadow: 0px 1px 1px #000;
   border: 1px solid #A30000;
-};
+}
 
 /* Scrollbar theming */
 ::-webkit-scrollbar {

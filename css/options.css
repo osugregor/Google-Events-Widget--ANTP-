@@ -87,16 +87,32 @@ section.selected {
 }
 
 /* Sizing for generic form elemnts */
+input {
+    border: 0;
+    width: 56px;
+}
+label {
+    margin-left: 9px;
+}
 .number input { width: 50px; }
-.alpha input { width: 45px; }
+.number label {margin-left: 15px;}
+
+input[type='color']{
+    vertical-align: middle;
+    -webkit-appearance: button-bevel;
+}
 
 #settings label {
-    margin-left: 10px;
     color: #999;
 }
 
+.field {
+    
+    margin-bottom: 10px;
+}
+
 fieldset {
-    padding: 0;
+    padding: 0 0 0 14px;
     margin: 0 0 25px;
     border: 0;
 }
@@ -110,6 +126,20 @@ fieldset legend, h2 {
     margin: 0;
 }
 
+fieldset legend {
+    margin-left: -14px;
+}
+
+.reset {
+    color: #CECECE;
+    cursor: pointer;
+    font-style: italic;
+    font-size: .8em;
+}
+.reset:hover {
+    color: black;
+}
+
 h2:not(.first) {
     margin-top: 30px;
 }
@@ -121,9 +151,6 @@ h3 {
     font-weight: normal;
 }
 
-fieldset div {
-    margin-left: 20px;
-}
 
 #buttons {
     margin-top: 20px;

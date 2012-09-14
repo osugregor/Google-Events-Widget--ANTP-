@@ -116,8 +116,12 @@ $(document).ready(function() {
 
         // Loop every day for days_to_show
         for (current_day_offset; current_day_offset < days_to_show; current_day_offset++) {
-            var current_day_start = new moment().add('days', current_day_offset).sod();
+            var current_day_start = new moment().add('days', current_day_offset);
             var current_day_end = current_day_start.clone().eod();
+
+            if(ShayJS.get("show_events_which_ended") == "true"){
+                current_day_start = current_day_start.sod();
+            }
 
             $list.append($.fn._cal_header(current_day_start.calendar(), 0));
 
@@ -126,6 +130,7 @@ $(document).ready(function() {
 
                 //convert start/end to date object
                 var event = events[i];
+
                 if(event.end.toDate() <= current_day_start.toDate() || (event.start.toDate() >= current_day_end.toDate())) continue;
 
                 eventCount++;
@@ -142,6 +147,7 @@ $(document).ready(function() {
                 if(location)tooltip = tooltip +'\n' + location;
 
                 var $li = $.fn._cal_event(event.title, location, time, event.url, color, i);
+                
                 if(!event.allDay && (event.end < now)){
                     $li.css('opacity', ShayJS.get('event_old_fade_amount'));
                 }
