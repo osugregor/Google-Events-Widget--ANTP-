@@ -108,8 +108,8 @@ $(document).ready(function() {
         if (events.length == 0) { return; }//leave if no events
 
         //<ul data-role="listview" data-theme="a" data-divider-theme="c">
-        
-        $(this).html('');        
+
+        $list.html('');
 
         var days_to_show = ShayJS.get('days_to_show', ShayJS.Google.Calendar);
         var current_day_offset = 0;//keeps track of which day we are on 
