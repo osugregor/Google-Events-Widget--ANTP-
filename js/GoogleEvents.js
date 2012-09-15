@@ -52,9 +52,9 @@ $(document).ready(function() {
 
         //If no events exists, exit
         if(incoming_events == null){
-            Widget.shouldUpdate(true);
-            Widget.shouldFetch(true);
-            notify('FETCHING', "Fetching Events...");
+            //Widget.shouldFetch(true);
+            ShayJS.antp.Widget.notification("FETCHING", "Fetching Events...");
+            //notify('FETCHING', "Fetching Events...");
             return;
         }
 

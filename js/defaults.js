@@ -1,4 +1,4 @@
-ShayJS.DEBUG = true;
+ShayJS.DEBUG = false;
 
 ShayJS.extend(ShayJS.defaults, {
 

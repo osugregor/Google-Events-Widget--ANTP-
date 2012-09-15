@@ -2,7 +2,7 @@
 	
     "name": "Google Events [ANTP]",
     "manifest_version": 2,
-    "version": "1.3.0",
+    "version": "2.0.1",
     "description": "Google event widget for Awesome New Tab Page [ANTP]",
     "background": {
 		"scripts": [ "lib/jquery.min.js", "lib/moment.min.js", "lib/moment.lang-all.min.js", "lib/shayjs.js", "lib/shayjs.date.js", "lib/shayjs.antp.js", "lib/shayjs.google.js",  "js/defaults.js", "js/background.js" ]

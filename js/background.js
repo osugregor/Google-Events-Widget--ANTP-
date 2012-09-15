@@ -10,7 +10,7 @@ var info = {
         "min_width" :   1,
         "max_width" :   2,
         "min_height":   1,
-        "max_height":   3
+        "max_height":   2
     },
     "v3"      :   {
         "multi_placement": false // Allows the widget to be placed more than once
@@ -55,9 +55,10 @@ ShayJS.extend(ShayJS.Google.Calendar, {
 	onFetchComplete: function(events) {
 		console.log("Fetch Complete! " + events.length + " Events.");
 		ShayJS.set("events", JSON.stringify(events));
+        ShayJS.antp.Widget.notification("FETCHING");
         ShayJS.antp.Widget.alert("NO_SESSION", "");
 		ShayJS.antp.Widget.fetching(false);
-		ShayJS.antp.Widget.shouldUpdate();
+		ShayJS.antp.Widget.shouldUpdate(true);
 	},	
 	
 	onRequireLogin: function(response) {
