@@ -190,21 +190,20 @@ body {
 }
 
 #loader-box {
-  background: rgba(0, 0, 0, .8);
-  border-top: black 1px solid;
+  background: rgba(80, 80, 80, .8);
   display: block;
+  font-size: .7em;
   height: 100%;  
   margin-top: 0;  
-  position: absolute;  
-  top: 406px;
-  z-index: 100;
 }
 
 #loader-box a { color: #5E87B0;}
 #loader-box a:hover { color: #E47911;}
 
 #loader-box h1 {
-  padding: 1em;
+    padding: 4px 5px;
+    text-align: center;
+    line-height: 1.15;
 }
 
 .notification {

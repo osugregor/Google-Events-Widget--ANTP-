@@ -20,6 +20,8 @@ ShayJS.extend(ShayJS.defaults, {
 
 	'event_old_fade_amount': .5,
 	'fetch_interval': 10*60,
-	'show_events_which_ended': "true"
+	'show_events_which_ended': "true",
+
+    'lastFetch': 'unknown'
 
 });

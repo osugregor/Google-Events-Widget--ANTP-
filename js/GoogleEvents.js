@@ -22,14 +22,14 @@ $(document).ready(function() {
 
     // When anything in localStorage changes
     $(window).bind('storage', function () {
-        ShayJS.log("[EVENT] Storage Changed", localStorage);
+        ShayJS.log("[EVENT] Storage Changed:", localStorage);
 
         $('#header_text a').html(ShayJS.get('header_text'));
         if(ShayJS.val('header_color_1') || ShayJS.val('header_color_2')){
             $('.google-header').css('background-image', '-webkit-linear-gradient( ' + ShayJS.get('header_color_1') + ' , ' + ShayJS.get('header_color_2') + ' )').css('border-color', ShayJS.get('header_color_2'));
         }
-        var incoming_events = ShayJS.get("events") || null;
 
+        var incoming_events = ShayJS.get("events") || null;
         var widget_notifications = Widget.getNotifications();
         var widget_alerts = Widget.getAlerts();
 
@@ -52,11 +52,10 @@ $(document).ready(function() {
 
         //If no events exists, exit
         if(incoming_events == null){
-            //Widget.shouldFetch(true);
             ShayJS.antp.Widget.notification("FETCHING", "Fetching Events...");
-            //notify('FETCHING', "Fetching Events...");
             return;
         }
+        ShayJS.antp.Widget.notification("FETCHING");
 
         //Check if any events changed or where added, or if the events displayed ar not the events retreived
         if(Widget.shouldUpdate() || (local_storage_events.localeCompare(incoming_events) != 0 && incoming_events.length > 0) || (incoming_events.length > 0 && $("#events_ul li").length == 0)){
@@ -65,27 +64,21 @@ $(document).ready(function() {
             local_storage_events = incoming_events;
             updateContent();
             init_load = false;
-        }else{
-            //No changes occured, display a notification
-            if(!init_load && !Widget.isFetching()){
-                //notify('no_changes','No Changes Occured', true);
-            }
-        }        
+        }
     });
 
 
     function refreshButton(force){
+        if(reloading_timeout)return;
         if(Widget.isFetching() || force){
             $('#refresh').addClass('spin');
             reloading_timeout = true;
             setTimeout(function(){
                 reloading_timeout = false;
-                $(window).trigger('storage');
+                refreshButton();
             }, 1000);
         }else{
-            if(!reloading_timeout){
-                $('#refresh').removeClass('spin');
-            }
+            $('#refresh').removeClass('spin');
         }
     }
 
@@ -173,13 +166,11 @@ $(document).ready(function() {
         update_cal_header_counts($list);
 
         $list.bind('mousewheel', function(e, d) {
-            var height = $('#events ul').height(), scrollHeight = $('#events ul').get(0).scrollHeight;
+            var height = $('#events_ul').height(), scrollHeight = $('#events_ul').get(0).scrollHeight;
             if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
                 e.preventDefault();
             }
         });
-
-        
     }
 
     function update_cal_header_counts($list){

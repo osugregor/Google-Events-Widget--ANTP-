@@ -156,7 +156,7 @@
       "message": "Send Mail..."
    },
    "SESSION_ERROR_ALERT": {
-      "message": "Can't retrieve calendar info. Please \u003Ca href='$1' target='_blank'\u003ESign in\u003C/a\u003E to Google Calendar and try again."
+      "message": "\u003Ca href='$2' target='_blank'\u003ESign in\u003C/a\u003E to Refresh\u003Cbr\u003ELast Refresh: $1"
    },
    "SHORTDAY_NAMES": {
       "message": "Sun,Mon,Tue,Wed,Thu,Fri,Sat"
