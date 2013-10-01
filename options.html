@@ -11,7 +11,7 @@
     <script type="text/javascript" src="js/jquery.gritter.min.js"></script>
     <script type="text/javascript" src="js/defaults.js"></script>
     <script type="text/javascript" src="js/options.js"></script>
-	
+
 	<link href='css/zocial.css' rel='stylesheet' type='text/css'>
 	<link href='css/formalize.css' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
@@ -84,7 +84,7 @@
                 <a href="http://momentjs.com/docs/#/displaying/format/" target="_blank" title="moment.js formatting guide">Moment JS Formatting</a>
             </p>
             <div class="field date_format">
-                <label for="date_format_nextDay" class="big"><b>Date Format Same Day:</b></label>
+                <label for="date_format_sameDay" class="big"><b>Date Format Same Day:</b></label>
                 <input type="text" id="date_format_sameDay" required />
                 <label for="date_format_sameDay"> The format of the Date Text.</label>
             </div>
@@ -96,9 +96,18 @@
             </div>
 
             <div class="field date_format">
-                <label for="date_format_nextDay" class="big"><b>Date Format Else:</b></label>
+                <label for="date_format_else" class="big"><b>Date Format Else:</b></label>
                 <input type="text" id="date_format_else" required />
                 <label for="date_format_else"> The format of the Date Text.</label>
+            </div>
+
+            <div class="field">
+                <label for="use_24hr_format" class="big"><b>Use 24 Hour Time Format:</b></label>
+                <select id="use_24hr_format">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                <label for="use_24hr_format"> The format of the Time Text.</label>
             </div>
 
 		</fieldset>
@@ -133,14 +142,14 @@
         </div>
 
 
-		<fieldset>			
+		<fieldset>
             <legend>Past Events</legend>
 
             <div class="field">
                 <select id="show_events_which_ended">
                     <option value="true">Yes</option>
                     <option value="false">No</option>
-                </select>    
+                </select>
                 <label for="show_events_which_ended"><b>Show Past Events:</b> display events that ended before the current time?</label>
             </div>
 
@@ -149,7 +158,7 @@
                 <label for="event_old_fade_amount"><b>Ended Opacity</b> for events that ended</label>
 			</div>
 
-            
+
 
 		</fieldset>
 
@@ -161,6 +170,15 @@
 
 	<section id="updates">
 		<h1>Updates</h1>
+
+        <h2 class="first">Version 2.2.0</h2>
+        <ul>
+            <li>Added 24 hour support to the events.</li>
+        </ul>
+        <h3>Bug Fixes</h3>
+        <ul>
+            <li>Case insensitive name fix. SOme js files where not loading on platforms that where case sensitive.</li>
+        </ul>
 
         <h2 class="first">Version 2.1.1</h2>
         <ul>

@@ -1,4 +1,4 @@
-ShayJS.DEBUG = false;
+ShayJS.DEBUG = true;
 
 ShayJS.extend(ShayJS.defaults, {
 
@@ -8,11 +8,12 @@ ShayJS.extend(ShayJS.defaults, {
 	'date_format_sameDay': 'MMM D (ddd) - [Today]',
 	'date_format_nextDay': 'MMM D (ddd) - [Tomorrow]',
 	'date_format_else': 'MMM D (ddd)',
+	'use_24hr_format': "false",
 
 	'bg_color': '#000000',
 	'header_color_1': '#81a8ce',
 	'header_color_2': '#5e87b0',
-	
+
 	'date_color': '#505050',
 	'event_title_color': '#ffffff',
 	'event_time_color': '#ffffff',

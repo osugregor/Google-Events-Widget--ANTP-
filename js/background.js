@@ -54,19 +54,19 @@ ShayJS.extend(ShayJS.Google.Calendar, {
 
 	onFetchComplete: function(events) {
 		console.log("Fetch Complete! " + events.length + " Events.");
+        ShayJS.antp.Widget.fetching(false);
 		ShayJS.set("events", JSON.stringify(events));
         ShayJS.set("lastFetch", moment().calendar());
         ShayJS.antp.Widget.notification("FETCHING");
         ShayJS.antp.Widget.alert("NO_SESSION", "");
-		ShayJS.antp.Widget.fetching(false);
 		ShayJS.antp.Widget.shouldUpdate(true);
-	},	
-	
+	},
+
 	onRequireLogin: function(response) {
 		ShayJS.antp.Widget.alert("NO_SESSION", l("SESSION_ERROR_ALERT", [ShayJS.get("lastFetch"),"https://www.google.com/calendar/"]));
         ShayJS.antp.Widget.fetching(false);
 	},
-	
+
 	onGetCalendarFail: function() {
 		ShayJS.antp.Widget.alert("FETCH_FAIL", l("NOTHING_CALENDARLIST"));
         ShayJS.antp.Widget.fetching(false);
