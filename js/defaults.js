@@ -3,6 +3,7 @@ ShayJS.DEBUG = true;
 ShayJS.extend(ShayJS.defaults, {
 
 	'days_to_show': 25,
+    'days_offset': 0,
 	'header_text': 'Google Events',
 
 	'date_format_sameDay': 'MMM D (ddd) - [Today]',

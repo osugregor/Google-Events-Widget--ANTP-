@@ -70,6 +70,11 @@
                 <label for="days_to_show"><b>Days to Show:</b> the number of days that are visible.</label>
 			</div>
 
+            <div class="field number">
+                <input type="number" step="1" id="days_offset" required />
+                <label for="days_offset"><b>Day Offset:</b> What day should we start displaying events (yesterday/today?).</label>
+            </div>
+
             <div class="field text">
                 <label for="header_text" class="big"><b>Widget Header:</b></label>
                 <input type="text" id="header_text" required />
@@ -170,6 +175,11 @@
 
 	<section id="updates">
 		<h1>Updates</h1>
+
+        <h2 class="first">Version 2.3.0</h2>
+        <ul>
+            <li>Added an offset which allows you to specify the first day that should be displayed. Now you can have it show yesterday.</li>
+        </ul>
 
         <h2 class="first">Version 2.2.0</h2>
         <ul>

@@ -1,5 +1,5 @@
 moment.calendar = {
-    lastDay : '[Yesterday]',
+    lastDay : 'MMM D (ddd) - [Yesterday]',
     sameDay : 'MMM D (ddd) - [Today]',
     nextDay : 'MMM D (ddd) - [Tomorrow]',
     lastWeek : 'MMM D (ddd)',
@@ -102,7 +102,7 @@ function updateContent(){
     $list.html('');
 
     var days_to_show = ShayJS.get('days_to_show', ShayJS.Google.Calendar);
-    var current_day_offset = 0;//keeps track of which day we are on
+    var current_day_offset = ShayJS.get('days_offset') || 0;//keeps track of which day we are on
 
     // Loop every day for days_to_show
     for (current_day_offset; current_day_offset < days_to_show; current_day_offset++) {
